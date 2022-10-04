@@ -411,7 +411,7 @@ public class FieldNavigation {
     }
 
     /**
-     * step methode which executes step methodes
+     * step methode which executes step methods
      */
     public void step() {
         stepRotation();
