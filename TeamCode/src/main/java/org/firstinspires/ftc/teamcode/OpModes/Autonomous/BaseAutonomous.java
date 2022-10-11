@@ -14,6 +14,17 @@ public abstract class BaseAutonomous extends LinearOpMode {
     void initialize() {
     }
 
+    public void detectSignal() {
+    };
+
+    public void driveToJunction() {
+
+    };
+
+    public void driveToZone() {
+
+    };
+
     public abstract BaseHardwareMap initializeHardwareMap();
     
     public abstract void run();
