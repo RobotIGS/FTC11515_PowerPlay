@@ -107,10 +107,10 @@ public class FieldNavigation {
      */
     protected double[] calculateWheelSpeeds(double vx, double vz, double wy) {
         return new double[]{
-                (ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
-                (ONE_D_R * vx) - (ONE_D_R * vz) + ((lx + lz) * wy * ONE_D_R),
+                -(ONE_D_R * vx) - (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
                 (ONE_D_R * vx) - (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
-                (ONE_D_R * vx) + (ONE_D_R * vz) + ((lx + lz) * wy * ONE_D_R)
+                -(ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
+                (ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R)
         };
     }
 
