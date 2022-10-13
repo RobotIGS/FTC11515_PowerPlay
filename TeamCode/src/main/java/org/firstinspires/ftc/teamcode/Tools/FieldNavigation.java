@@ -339,13 +339,13 @@ public class FieldNavigation {
 
         // calculate the distance
         double dx = (
-                (R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) +
+               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) +
+                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) -
                 (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
                 (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
         double dz = (
-                (R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) -
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) -
+               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) -
+                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) +
                 (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
                 (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
 
