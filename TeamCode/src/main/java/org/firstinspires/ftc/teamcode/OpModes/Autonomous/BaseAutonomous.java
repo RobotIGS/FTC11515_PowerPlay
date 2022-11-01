@@ -19,6 +19,21 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     public void driveToJunction() {
 
+        /*
+        [-108,0,30] (starting position)
+        [-108,0,0]
+        aQW
+             (three points?)
+             [-78,0,0]
+             [-108,0,90]
+             [-108,0,150]
+
+        [-78,0,0]
+        [0,0,0]
+         */
+
+
+
     };
 
     public void driveToZone() {
