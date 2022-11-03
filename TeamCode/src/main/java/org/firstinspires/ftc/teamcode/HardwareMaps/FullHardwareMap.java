@@ -17,5 +17,6 @@ public class FullHardwareMap extends BaseHardwareMap {
         motor_front_right = hwMap.get(DcMotor.class, "hub1_motorport3");
         motor_rear_left = hwMap.get(DcMotor.class, "hub1_motorport1");
         motor_rear_right = hwMap.get(DcMotor.class, "hub1_motorport2");
+        motor_lift = hwMap.get(DcMotor.class, "hub2_motorport0");
     }
 }
