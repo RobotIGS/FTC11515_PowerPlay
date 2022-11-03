@@ -13,5 +13,10 @@ public class FullControl extends BaseTeleOp {
 
     @Override
     public void loop() {
+        if (gamepad1.a) {
+            robot.motor_lift.setPower(gamepad1.right_stick_y);
+        } else {
+            robot.motor_lift.setPower(0);
+        }
     }
 }
