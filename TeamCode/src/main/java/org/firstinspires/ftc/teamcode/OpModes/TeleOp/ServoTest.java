@@ -15,11 +15,11 @@ public class ServoTest extends BaseTeleOp {
     @Override
     public void loop() {
         if (gamepad1.x) {
-            robot.servo1.setPosition(0.5);
-            robot.servo2.setPosition(-0.5);
+            robot.servo1.setPosition(0.0);
+            robot.servo2.setPosition(0.4);
         }
         if (gamepad1.y) {
-            robot.servo1.setPosition(0.0);
+            robot.servo1.setPosition(0.4);
             robot.servo2.setPosition(0.0);
         }
     }
