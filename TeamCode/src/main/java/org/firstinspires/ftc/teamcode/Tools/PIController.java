@@ -10,7 +10,7 @@ public class PIController {
 
     public PIController(double p, double i) {
         this.p = p;
-        this.i = 0;
+        this.i = i;
     }
 
     public void step(double error) {
