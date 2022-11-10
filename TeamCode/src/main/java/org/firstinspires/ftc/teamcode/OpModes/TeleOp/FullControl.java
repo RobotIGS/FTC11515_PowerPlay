@@ -26,10 +26,13 @@ public class FullControl extends BaseTeleOp {
     @Override
     public void loop() {
         wy = (gamepad1.left_trigger != 0.0) ? gamepad1.left_trigger : -gamepad1.right_trigger;
-        navi.drive_setSpeed(gamepad1.left_stick_y, gamepad1.left_stick_x, wy, 1.0);
+        navi.drive_setSpeed(gamepad1.left_stick_y, gamepad1.left_stick_x, wy, 0.4);
         navi.step();
         telemetry.addData("wy :", wy);
         telemetry.addData("vx :", gamepad1.left_stick_y);
         telemetry.addData("vz :", gamepad1.left_stick_x);
+        telemetry.addData("x :", navi.position_x);
+        telemetry.addData("z :", navi.position_z);
+        telemetry.update();
     }
 }
