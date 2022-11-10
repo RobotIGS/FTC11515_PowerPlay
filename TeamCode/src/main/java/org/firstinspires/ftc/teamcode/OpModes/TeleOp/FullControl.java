@@ -19,6 +19,7 @@ public class FullControl extends BaseTeleOp {
     public void initialize() {
 
         robot = new FullHardwareMap(hardwareMap);
+        gyro = new GyroHardwareMap(hardwareMap);
         navi = new FieldNavigation(robot, gyro, 0.0,0.0, 0.0, 0.0,0.0);
     }
 
@@ -30,7 +31,7 @@ public class FullControl extends BaseTeleOp {
             robot.motor_lift.setPower(0);
         }
         wy = (gamepad1.left_trigger != 0.0) ? gamepad1.left_trigger : -gamepad1.right_trigger;
-        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy,0.2);
-
+        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy,0.7);
+        navi.step();
     }
 }
