@@ -374,6 +374,14 @@ public class FieldNavigation {
     }
 
     /**
+     * update wy without driving (only rotating)
+     */
+    protected void stepRotate() {
+        stepGyro();
+        step();
+    }
+
+    /**
      * update rotation speeds
      */
     protected void stepGyro() {
