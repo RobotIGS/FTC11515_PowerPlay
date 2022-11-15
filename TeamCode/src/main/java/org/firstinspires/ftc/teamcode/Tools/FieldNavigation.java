@@ -191,16 +191,7 @@ public class FieldNavigation {
     public void drive_rel(double dx, double dz, double speed, double acc) {
         // convert rel2pos
         double[] pos = convert_rel2pos(dx,dz);
-
-        // set target pos
-        target_position_x = pos[0];
-        target_position_z = pos[1];
-
-        // set drive flag and target acc
-        drive = true;
-        drive_speed = speed;
-        drive_acc = acc;
-        target_reached = false;
+        drive_to_pos(pos[0], pos[1], speed, acc);
     }
 
     /**
@@ -264,19 +255,25 @@ public class FieldNavigation {
             if (Math.abs(speed) > 1) {
                 speed /= Math.abs(speed);
             }
-            vx = (vx/vmax) *speed;
-            vz = (vz/vmax) *speed;
+            vx = vx/vmax;
+            vz = vz/vmax;
         }
         // wy *= speed;
 
         // get wheel speeds
         wheelSpeeds = calculateWheelSpeeds(vx, vz, wy);
+        double vm = Math.max(Math.max(Math.abs(wheelSpeeds[0]),Math.abs(wheelSpeeds[0])),Math.max(Math.abs(wheelSpeeds[0]),Math.abs(wheelSpeeds[0])));
+
+        wheelSpeeds[0] /= vm;
+        wheelSpeeds[1] /= vm;
+        wheelSpeeds[2] /= vm;
+        wheelSpeeds[3] /= vm;
 
         // set motor power
-        robot.motor_front_left.setPower(wheelSpeeds[0]);
-        robot.motor_front_right.setPower(wheelSpeeds[1]);
-        robot.motor_rear_left.setPower(wheelSpeeds[2]);
-        robot.motor_rear_right.setPower(wheelSpeeds[3]);
+        robot.motor_front_left.setPower(wheelSpeeds[0] * speed);
+        robot.motor_front_right.setPower(wheelSpeeds[1] * speed);
+        robot.motor_rear_left.setPower(wheelSpeeds[2] * speed);
+        robot.motor_rear_right.setPower(wheelSpeeds[3] * speed);
     }
 
     /**
@@ -371,16 +368,17 @@ public class FieldNavigation {
             double[] rel = convert_pos2rel(vx,vz);
             vx = rel[0];
             vz = rel[1];
-
-            // get max distance
-            double maxDistance = Math.max(Math.abs(vx), Math.abs(vz));
-
-            // get direction speeds in percent
-            vx /= maxDistance;
-            vz /= maxDistance;
         }
         // set motor speeds
         drive_setMotors(vx, vz, wy, drive_speed);
+    }
+
+    /**
+     * update wy without driving (only rotating)
+     */
+    protected void stepRotate() {
+        stepGyro();
+        step();
     }
 
     /**
