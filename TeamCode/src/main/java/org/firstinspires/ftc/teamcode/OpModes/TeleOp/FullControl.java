@@ -33,6 +33,7 @@ public class FullControl extends BaseTeleOp {
         telemetry.addData("vz :", gamepad1.left_stick_x);
         telemetry.addData("x :", navi.position_x);
         telemetry.addData("z :", navi.position_z);
+        telemetry.addData("rotY :", navi.rotation_y);
         telemetry.update();
     }
 }
