@@ -25,8 +25,8 @@ public abstract class BaseAutonomous extends LinearOpMode {
         navi = new FieldNavigation(robot, gyro,
                 Quadrant() % 2 == 0 ? -89 : 89,
                 Quadrant() / 2 >= 1 ? -155 : 155,
-                Quadrant() < 2 ? 90 : -90,
-                0.7/180., 0.5
+                0, //Quadrant() < 2 ? 90 : -90,
+                -0.03, 0.0
         );
     }
 
@@ -44,6 +44,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (navi.drive && opModeIsActive()) {
             telemetry.addData("x", navi.position_x);
             telemetry.addData("z", navi.position_z);
+            telemetry.addData("error ry:", navi.target_rotation_y-navi.rotation_y);
+            telemetry.addData("ry:", navi.rotation_y);
+            telemetry.addData("try:", navi.target_rotation_y);
+            telemetry.addData("sry:", navi.start_rotation_y);
             telemetry.update();
             navi.step();
         }

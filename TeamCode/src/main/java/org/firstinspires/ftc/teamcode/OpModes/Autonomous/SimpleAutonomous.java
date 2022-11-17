@@ -11,7 +11,7 @@ public class SimpleAutonomous extends BaseAutonomous {
         driveToJunctionMid();
         telemetry.addData("step", 1);
         telemetry.update();
-        //placeConeOnMid();
+        placeConeOnMid();
         telemetry.addData("step", 2);
         telemetry.update();
         //parkTerminal();
