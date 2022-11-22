@@ -38,10 +38,10 @@ public class FullControl extends BaseTeleOp {
             robot.servo2.setPosition(0.0);
         }
         if (gamepad1.dpad_down) {
-            robot.servo3.setPosition(0.5);
+            robot.servo3.setPosition(0.1);
         }
         if (gamepad1.dpad_up)  {
-            robot.servo3.setPosition(0.0);
+            robot.servo3.setPosition(0.3);
         }
         wy = (gamepad1.left_trigger != 0.0) ? gamepad1.left_trigger : -gamepad1.right_trigger;
         navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy,0.5);
