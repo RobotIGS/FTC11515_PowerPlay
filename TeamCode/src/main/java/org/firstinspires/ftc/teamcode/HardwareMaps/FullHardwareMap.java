@@ -21,5 +21,6 @@ public class FullHardwareMap extends BaseHardwareMap {
         motor_lift = hwMap.get(DcMotor.class, "hub2_motorport0");
         servo1 = hwMap.get(Servo.class,   "hub1_servoport0");
         servo2 = hwMap.get(Servo.class, "hub1_servoport1");
+        servo3 = hwMap.get(Servo.class, "hub1_servoport2");
     }
 }
