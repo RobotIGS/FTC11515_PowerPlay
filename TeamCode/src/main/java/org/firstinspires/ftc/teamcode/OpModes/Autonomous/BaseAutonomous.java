@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
 public abstract class BaseAutonomous extends LinearOpMode {
     private BaseHardwareMap robot;
     private GyroHardwareMap gyro;
-    private FieldNavigation navi;
+    public FieldNavigation navi;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,7 +26,8 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 Quadrant() % 2 == 0 ? -89 : 89,
                 Quadrant() / 2 >= 1 ? -155 : 155,
                 0, //Quadrant() < 2 ? 90 : -90,
-                -0.03, 0.0
+                0,0
+                //-0.03, 0.0
         );
     }
 

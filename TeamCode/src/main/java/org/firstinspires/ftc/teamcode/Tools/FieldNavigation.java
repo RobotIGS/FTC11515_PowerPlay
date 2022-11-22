@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Tools;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 
@@ -59,8 +60,8 @@ public class FieldNavigation {
     private double drive_acc;
 
     // target rotation of the robot
-    private double target_rotation_y;
-    private double start_rotation_y;
+    public double target_rotation_y;
+    public double start_rotation_y;
     private double gyro_start_rotation;
 
     /* constructor */
@@ -107,10 +108,10 @@ public class FieldNavigation {
      */
     protected double[] calculateWheelSpeeds(double vx, double vz, double wy) {
         return new double[]{
-                -(ONE_D_R * vx) - (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
-                (ONE_D_R * vx) - (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
-                -(ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R),
-                (ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy * ONE_D_R)
+                ((ONE_D_R * vx) + (ONE_D_R * vz) - ((lx + lz) * wy) * ONE_D_R),
+                ((ONE_D_R * vx) - (ONE_D_R * vz) + ((lx + lz) * wy) * ONE_D_R),
+                ((ONE_D_R * vx) - (ONE_D_R * vz) - ((lx + lz) * wy) * ONE_D_R),
+                ((ONE_D_R * vx) + (ONE_D_R * vz) + ((lx + lz) * wy) * ONE_D_R)
         };
     }
 
@@ -335,16 +336,8 @@ public class FieldNavigation {
         gyro_correction_steps[3] = 0;
 
         // calculate the distance
-        double dx = (
-               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) -
-                (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
-        double dz = (
-               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) -
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
+        double dx = (delta_s1 + delta_s2 + delta_s3 + delta_s4) * R_D_FOUR * TWOPI_D_CPERMREV;
+        double dz = (delta_s1 - delta_s2 - delta_s3 + delta_s4) * R_D_FOUR * TWOPI_D_CPERMREV;
 
         // set new position
         double[] dp = convert_rel2pos(dx,dz);
@@ -386,7 +379,13 @@ public class FieldNavigation {
      */
     protected void stepGyro() {
         // get rotation speed
-        rotation_pi_controller.step(target_rotation_y-rotation_y);
+        double err = target_rotation_y - rotation_y;
+        if (err < -180) {
+            err = 180 -(err % 180);
+        } else if (err > 180) {
+            err = -180 + (err % 180);
+        }
+        rotation_pi_controller.step(err);
         wy = rotation_pi_controller.out;
 
         gyro_correction_steps = calculateWheelSpeeds(0,0,wy);
@@ -404,8 +403,6 @@ public class FieldNavigation {
         } else if (rotation_y > 180) {
             rotation_y = -180 + (rotation_y % 180);
         }
-
-        rotation_y *= -1;
     }
 
     /**
