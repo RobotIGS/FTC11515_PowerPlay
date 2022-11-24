@@ -50,30 +50,30 @@ public class FullControl extends BaseTeleOp {
         } else if (gamepad1.a) {
             robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 5);
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motor_lift.setPower(0.5);
+            robot.motor_lift.setPower(1);
             // -5
         } else if (gamepad1.b) {
             robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 3750);
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motor_lift.setPower(0.5);
+            robot.motor_lift.setPower(1);
             // -5100
         } else if (gamepad1.x) {
             robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 6850);
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motor_lift.setPower(0.5);
+            robot.motor_lift.setPower(1);
             // -8050
         } else if (gamepad1.y) {
             robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10100);
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motor_lift.setPower(0.5);
+            robot.motor_lift.setPower(1);
             // -10400
         } else if (robot.motor_lift.getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
             robot.motor_lift.setPower(0);
         }
-        if (gamepad1.dpad_right) {
+        if (gamepad1.dpad_left) {
             robot.servo1.setPosition(0.0);
             robot.servo2.setPosition(0.4);
-        } else if (gamepad1.dpad_left) {
+        } else if (gamepad1.dpad_right) {
             robot.servo1.setPosition(0.4);
             robot.servo2.setPosition(0.0);
         }
