@@ -84,7 +84,8 @@ public class FullControl extends BaseTeleOp {
             robot.servo3.setPosition(0.3);
         }
         wy = (gamepad1.left_trigger != 0.0) ? gamepad1.left_trigger : -gamepad1.right_trigger;
-        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.7,0.35);
+
+        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.7,(gamepad1.left_bumper || gamepad1.right_bumper) ? 0.6 : 0.35);
         navi.step();
         telemetry.addData("lift :", robot.motor_lift.getCurrentPosition()-lift_start_encoder_value);
         telemetry.update();
