@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Tools;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 
@@ -59,8 +60,8 @@ public class FieldNavigation {
     private double drive_acc;
 
     // target rotation of the robot
-    private double target_rotation_y;
-    private double start_rotation_y;
+    public double target_rotation_y;
+    public double start_rotation_y;
     private double gyro_start_rotation;
 
     /* constructor */
@@ -393,7 +394,13 @@ public class FieldNavigation {
      */
     protected void stepGyro() {
         // get rotation speed
-        rotation_pi_controller.step(target_rotation_y-rotation_y);
+        double err = target_rotation_y - rotation_y;
+        if (err < -180) {
+            err = 180 -(err % 180);
+        } else if (err > 180) {
+            err = -180 + (err % 180);
+        }
+        rotation_pi_controller.step(err);
         wy = rotation_pi_controller.out;
 
         gyro_correction_steps = calculateWheelSpeeds(0,0,wy);
@@ -411,8 +418,6 @@ public class FieldNavigation {
         } else if (rotation_y > 180) {
             rotation_y = -180 + (rotation_y % 180);
         }
-
-        rotation_y *= -1;
     }
 
     /**
