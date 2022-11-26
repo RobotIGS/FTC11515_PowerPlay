@@ -18,7 +18,7 @@ public class NaviTest extends BaseTeleOp {
     public void initialize() {
         robot = new FullHardwareMap(hardwareMap);
         gyro = new GyroHardwareMap(hardwareMap);
-        navi = new FieldNavigation(robot, gyro, 0.0, 0.0, 0.0, 0.0, 0.1E-4);
+        navi = new FieldNavigation(robot, gyro, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
     @Override
@@ -26,16 +26,16 @@ public class NaviTest extends BaseTeleOp {
 
         if (!navi.drive) {
             if (gamepad1.a) {
-                navi.drive_to_pos(0,0,1,2);
+                navi.drive_to_pos(0,0,0.5,2);
             }
             else if (gamepad1.b) {
-                navi.drive_to_pos(0,100,1,2);
+                navi.drive_to_pos(0,100,0.5,2);
             }
             else if (gamepad1.y) {
-                navi.drive_to_pos(100,100,1,2);
+                navi.drive_to_pos(100,100,0.5,2);
             }
             else if (gamepad1.x) {
-                navi.drive_to_pos(100, 0, 1, 2);
+                navi.drive_to_pos(100, 0, 0.5, 2);
             }
         }
 
@@ -44,9 +44,9 @@ public class NaviTest extends BaseTeleOp {
         telemetry.addData("Pos z", navi.position_z);
         telemetry.addData("rotY", navi.rotation_y);
         telemetry.addData("wy", navi.wy);
-        telemetry.addData("Drive", navi.drive);
         telemetry.addData("vx", navi.vx);
         telemetry.addData("vz", navi.vz);
+        telemetry.addData("Drive", navi.drive);
         telemetry.update();
 
     }

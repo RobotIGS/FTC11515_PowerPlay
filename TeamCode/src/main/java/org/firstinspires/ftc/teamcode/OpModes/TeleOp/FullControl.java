@@ -23,7 +23,7 @@ public class FullControl extends BaseTeleOp {
 
         robot = new FullHardwareMap(hardwareMap);
         gyro = new GyroHardwareMap(hardwareMap);
-        navi = new FieldNavigation(robot, gyro, 0.0,0.0, 0.0, 0.7/180,0.5);
+        navi = new FieldNavigation(robot, gyro, 0.0, 0.0, 0.0, 0.0/180, 0.0);
         lift_start_encoder_value  = robot.motor_lift.getCurrentPosition();
     }
 
@@ -87,6 +87,9 @@ public class FullControl extends BaseTeleOp {
 
         navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.7,(gamepad1.left_bumper || gamepad1.right_bumper) ? 0.75 : 0.35);
         navi.step();
+        telemetry.addData("x :", navi.position_x);
+        telemetry.addData("z :", navi.position_z);
+        telemetry.addData("rotY :", navi.rotation_y);
         telemetry.addData("lift :", robot.motor_lift.getCurrentPosition()-lift_start_encoder_value);
         telemetry.update();
     }
