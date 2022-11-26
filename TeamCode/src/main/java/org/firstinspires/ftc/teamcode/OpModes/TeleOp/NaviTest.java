@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.FullHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
-@TeleOp
+
 public class NaviTest extends BaseTeleOp {
     BaseHardwareMap robot;
     FieldNavigation navi;

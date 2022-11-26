@@ -5,7 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.Date;
 
-public class SimpleAutonomous extends BaseAutonomous {
+@Autonomous
+public class AutoRight extends BaseAutonomous {
     @Override
     public void run() {
         /*
@@ -37,8 +38,12 @@ public class SimpleAutonomous extends BaseAutonomous {
         robot.servo3.setPosition(0.3);
         robot.motor_lift.setTargetPosition((int) lift_start_pos-6850);
         robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.motor_lift.setPower(0.5);
-        navi.drive_to_pos(-70, 0, 0.4, 1);
+        navi.drive_to_pos(-70, 0, 0.35, 0.5);
+        startTime = (new Date()).getTime();
+        while (startTime+1300 > (new Date()).getTime() && opModeIsActive() && navi.drive) {
+            navi.step();
+        }
+        robot.motor_lift.setPower(0.7);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
