@@ -1,112 +1,99 @@
 package org.firstinspires.ftc.teamcode.Tools;
 
-import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
-import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
+import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 
 public class FieldNavigation {
-    // robot object
-    protected BaseHardwareMap robot;
-    protected GyroHardwareMap gyro;
-    protected PIController rotation_pi_controller;
+    private final BaseHardwareMap robot;
+    private final GyroHardwareMap gyro;
+    private final PIController gyro_pi_controller;
 
-    // statics
-    protected static final double COUNTS_PER_MOTOR_REV = 751.8; // 223rpm
-    //protected static final double COUNTS_PER_MOTOR_REV = 384.5; // 435rpm
-    protected static final double DRIVE_GEAR_REDUCTION = 1.0;      // This is < 1.0 if geared UP
-    protected static final double WHEEL_DIAMETER_CMS = 10.0;     // For figuring circumference
-    protected static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_CMS * Math.PI);
-    protected static final double ONE_D_R = 1 / (WHEEL_DIAMETER_CMS / 2);
-    protected static final double R_D_FOUR = WHEEL_DIAMETER_CMS/8;
-    protected static final double TWOPI_D_CPERMREV = (2*Math.PI) / COUNTS_PER_MOTOR_REV;
+    // constants
+    private final double MOTOR_STEPS_PER_REV = 751.8; // 223rpm:751.8
+    private final double WHEEL_DIAMETER_CM = 10;
 
-    // robot stuff (constants)
-    protected static final double lx = 1;
-    protected static final double lz = 1;
+    // finals
+    private final double MOTOR_STEPS_PER_CM = MOTOR_STEPS_PER_REV / (Math.PI*WHEEL_DIAMETER_CM);
+    protected final double ONE_D_R = 1 / (WHEEL_DIAMETER_CM/2);
+    protected final double R_D_FOUR = WHEEL_DIAMETER_CM/8;
+    protected final double TWOPI_D_CMPERREV = 2*Math.PI / MOTOR_STEPS_PER_REV;
 
-    // last steps of the motors
-    private double last_steps_fl;
-    private double last_steps_fr;
-    private double last_steps_rl;
-    private double last_steps_rr;
+    // robot start positioning
+    protected final double start_position_x;
+    protected final double start_position_z;
+    protected final double start_rotation_y;
+    protected final double start_gyro_rotation;
 
-    private double[] gyro_correction_steps = {0,0,0,0};
-
-    // robot speeds
-    public double vx = 0;
-    public double vz = 0;
-    public double wy = 0;
-
-    // position of the robot
+    // robot positioning
     public double position_x;
     public double position_z;
     public double rotation_y;
 
-    // wheel speeds
-    private double[] wheelSpeeds = {0,0,0,0};
+    // moving speeds
+    public double speed_vx;
+    public double speed_vz;
+    public double speed_wy;
 
-    // drive flags
-    public boolean drive = false;
-    public boolean target_reached = false;
+    // driving flags
+    private boolean is_driving;
+    private boolean is_target_reached;
 
-    // target position for navigation
+    // driving targets
     private double target_position_x;
     private double target_position_z;
-    private double drive_speed;
+    private double target_rotation_y;
+
+    // driving speeds
+    private double driving_speed;
+    private double target_driving_speed;
+
+    // driving accuracy
     private double drive_acc;
 
-    // target rotation of the robot
-    private double target_rotation_y;
-    private double start_rotation_y;
-    private double gyro_start_rotation;
+    // navigation stuff
+    private double[] motor_steps_last = new double[4];
+    private double[] motor_gyro_correction_steps = new double[4];
 
-    /* constructor */
-
-    /**
-     * one class to rule them all, (for the navigation of the robot)
-     * @param robot BaseHardwareMap object
-     * @param gyro  GyroHardwareMap object
-     * @param x     x start location
-     * @param z     z start location
-     * @param ry    start y rotation
-     * @param PI_d  PI controller for gyro correction d value (MAXPWR / 180)
-     * @param PI_i  PI controller for gyro correction i value
-     */
-    public FieldNavigation(BaseHardwareMap robot, GyroHardwareMap gyro, double x, double z, double ry, double PI_d, double PI_i) {
-        // hardware
+    public FieldNavigation(
+            BaseHardwareMap robot, GyroHardwareMap gyro, PIController gyro_pi_controller,
+            double position_x, double position_z, double rotation_y) {
         this.robot = robot;
         this.gyro = gyro;
+        this.gyro_pi_controller = gyro_pi_controller;
 
-        // PI controller
-        rotation_pi_controller = new PIController(PI_d, PI_i);
+        // start values (finals)
+        start_position_x = position_x;
+        start_position_z = position_z;
+        start_rotation_y = rotation_y;
 
-        // set start rotation (gyro)
-        gyro_start_rotation = gyro.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-        // set start steps
-        last_steps_fl = robot.motor_front_left.getCurrentPosition();
-        last_steps_fr = robot.motor_front_right.getCurrentPosition();
-        last_steps_rl = robot.motor_rear_left.getCurrentPosition();
-        last_steps_rr = robot.motor_rear_right.getCurrentPosition();
+        // getting start motor rotation
+        motor_steps_last[0] = robot.motor_front_left.getCurrentPosition();
+        motor_steps_last[1] = robot.motor_front_right.getCurrentPosition();
+        motor_steps_last[2] = robot.motor_rear_left.getCurrentPosition();
+        motor_steps_last[3] = robot.motor_rear_right.getCurrentPosition();
 
-        // robot position and rotation
-        position_x = x;
-        position_z = z;
-        rotation_y = ry;
-        start_rotation_y = ry;
-        target_rotation_y = ry;
-   }
+        // getting gyro start rotation
+        start_gyro_rotation = gyro.imu.getAngularOrientation(
+                AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+
+        // setting positions
+        this.position_x = position_x;
+        this.position_z = position_z;
+        this.rotation_y = rotation_y;
+    }
 
     /**
-     * calculate the speed of the motors out of the speed from the robot
+     * Calculates the speeds for each driving motor.
      * @param vx speed in x direction
-     * @param vz speed in y direction
-     * @param wy rotation speed
+     * @param vz speed in z direction
+     * @param wy rotation speed (y axes)
+     * @return array with motor speeds
      */
-    protected double[] calculateWheelSpeeds(double vx, double vz, double wy) {
-        return new double[]{
+    protected double[] CalculateWheelSpeeds(double vx, double vz, double wy) {
+        return new double[] {
                 (vx+vz-wy) * ONE_D_R,
                 (vx-vz+wy) * ONE_D_R,
                 (vx-vz-wy) * ONE_D_R,
@@ -115,313 +102,169 @@ public class FieldNavigation {
     }
 
     /**
-     * calculate wheel step targets
-     * @param wheelSpeeds an array with the speeds of the motors (return from calculateWheelSpeeds)
-     * @param maxDistance the absolute maximum distance of x and z in cm
-     * @return an array with the motor targets
+     * Setting the drive accuracy.
+     * @param accuracy accuracy in CM
      */
-    protected double[] calculateWheelTargets(double[] wheelSpeeds, double maxDistance) {
-        // relative speed * steps for max Distance
-
-        return new double[]{
-            robot.motor_front_left.getCurrentPosition() + wheelSpeeds[0] * (COUNTS_PER_CM * maxDistance),
-            robot.motor_front_right.getCurrentPosition() + wheelSpeeds[1] * (COUNTS_PER_CM * maxDistance),
-            robot.motor_rear_left.getCurrentPosition() + wheelSpeeds[2] * (COUNTS_PER_CM * maxDistance),
-            robot.motor_rear_right.getCurrentPosition() + wheelSpeeds[3] * (COUNTS_PER_CM * maxDistance)
-        };
+    public void Drive_SetTargetAccuracy(double accuracy) {
+        drive_acc = accuracy;
     }
 
     /**
-     * convert position (field cord system) into position (robot cord system)
-     * @param dx x position (field cord system)
-     * @param dz z position (field cord system)
-     * @return   an Array with x and z position (robot cord system)
+     * Drive to Field position.
+     * @param x coordinate
+     * @param z coordinate
+     * @param speed max driving speed
      */
-    protected double[] convert_pos2rel(double dx, double dz) {
-        double d = Math.sqrt(Math.pow(dx,2) + Math.pow(dz,2));
-        double[] ret = {0,0};
-        if (d == 0) {
-            return ret;
-        }
-
-        double alpha = Math.asin(dz/d);
-        if (dx < 0) {
-            alpha = Math.PI - alpha;
-        }
-        alpha -= Math.toRadians(rotation_y);
-
-        ret[0] = Math.cos(alpha) * d;
-        ret[1] = Math.sin(alpha) * d;
-
-        return ret;
-    }
-
-    /**
-     * convert position (robot cord system) to position (field cord system)
-     * @param dx x position (robot cord system)
-     * @param dz z position (robot cord system)
-     * @return   an Array with x and z position (field cord system)
-     */
-    protected double[] convert_rel2pos(double dx, double dz) {
-        double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz,2));
-        double[] ret = {0,0};
-        if (d == 0) {
-            return ret;
-        }
-
-        double alpha = Math.asin(dz/d);
-        if (dx < 0) {
-            alpha = Math.PI - alpha;
-        }
-        alpha += Math.toRadians(rotation_y);
-
-        ret[0] = Math.cos(alpha)*d;
-        ret[1] = Math.sin(alpha)*d;
-
-        return ret;
-    }
-
-    /**
-     * drive a specified distance relative to the robot current position with a specified accuracy
-     * @param dx    distance in x direction
-     * @param dz    distance in z direction
-     * @param speed speed factor
-     * @param acc   accuracy in cm
-     */
-    public void drive_rel(double dx, double dz, double speed, double acc) {
-        // convert rel2pos
-        double[] pos = convert_rel2pos(dx,dz);
-        drive_to_pos(pos[0], pos[1], speed, acc);
-    }
-
-    /**
-     * drive to a coordinate (field cord system) with a specified accuracy
-     * @param x     x coordinate
-     * @param z     z coordinate
-     * @param speed speed factor
-     * @param acc   accuracy in cm
-     */
-    public void drive_to_pos(double x, double z, double speed, double acc) {
-        // set target pos
+    public void Drive_ToPos(double x, double z, double speed) {
         target_position_x = x;
         target_position_z = z;
-
-        // set drive stuff
-        drive = true;
-        drive_speed = speed;
-        drive_acc = acc;
-        target_reached = false;
+        target_driving_speed = speed;
     }
 
     /**
-     * set speeds
-     * @param vx    speed in x direction (robot cord system)
-     * @param vz    speed in z direction (robot cord system)
-     * @param wy    rotation speed of the robot
-     * @param speed speed factor
+     * Drive a distance relative to the robot.
+     * @param x distance in x
+     * @param z distance in z
+     * @param speed max driving speed
      */
-    public void drive_setSpeed(double vx, double vz, double wy, double speed) {
-        this.vx = vx;
-        this.vz = vz;
-        this.wy = wy;
-        this.drive_speed = speed;
-        this.drive = false;
+    public void Drive_RelPos(double x, double z, double speed) {
+        // convert x,z to real coordinates
+        Drive_ToPos(x,z,speed);
     }
 
     /**
-     * set target rotation
-     * @param target target rotation of the robot (field cord system)
+     * Setting motor speeds based on direction speeds.
+     * @param vx speed in x direction
+     * @param vz speed in z direction
+     * @param wy rotation speed y axes
+     * @param speed speed factor applied to each motor speed.
      */
-    public void set_targetRotation(double target) {
-        if (target < -180) {
-            target = 180 -(target % 180);
-        } else if (target > 180) {
-            target = -180 + (target % 180);
-        }
-        target_rotation_y = target;
+    protected void Drive_setMotorSpeeds(double vx, double vz, double wy, double speed) {
+        double[] wheelSpeeds = CalculateWheelSpeeds(vx,vz,wy);
+
+        robot.motor_front_left.setPower(wheelSpeeds[0]*speed);
+        robot.motor_front_right.setPower(wheelSpeeds[1]*speed);
+        robot.motor_rear_left.setPower(wheelSpeeds[2]*speed);
+        robot.motor_rear_right.setPower(wheelSpeeds[3]*speed);
     }
 
-    /**
-     * set motor speeds
-     * @param vx    speed in x direction (robot cord system)
-     * @param vz    speed in z direction (robot cord system)
-     * @param wy    rotation speed of the robot
-     * @param speed speed factor
-     */
-    protected void drive_setMotors(double vx, double vz, double wy, double speed) {
-        // make sure the speeds are between -1 and 1
-        double vmax = Math.max(Math.abs(vx), Math.abs(vz));
-        if (vmax > 0) {
-            if (Math.abs(speed) > 1) {
-                speed /= Math.abs(speed);
+    public void Drive_Stop() {
+        is_driving = false;
+    }
+
+    public boolean IsTargetReached() {
+        // test if the robot already reached the target position
+        if (!is_target_reached) {
+            // calculate distance to target position
+            double d = Math.sqrt(
+                    Math.pow(target_position_x - position_x, 2) +
+                    Math.pow(target_position_z - position_z, 2));
+
+            // test if the robot is in a radius of the target (r=drive_acc)
+            if (d <= drive_acc) {
+                // setting target reached and stop the robot
+                is_target_reached = true;
+                Drive_Stop();
             }
-            vx = vx/vmax;
-            vz = vz/vmax;
-        }
-        // wy *= speed;
-
-        // get wheel speeds
-        wheelSpeeds = calculateWheelSpeeds(vx, vz, wy);
-        double vm = Math.max(Math.max(Math.abs(wheelSpeeds[0]),Math.abs(wheelSpeeds[0])),Math.max(Math.abs(wheelSpeeds[0]),Math.abs(wheelSpeeds[0])));
-
-        wheelSpeeds[0] /= vm;
-        wheelSpeeds[1] /= vm;
-        wheelSpeeds[2] /= vm;
-        wheelSpeeds[3] /= vm;
-
-        // set motor power
-        robot.motor_front_left.setPower(-wheelSpeeds[0] * speed);
-        robot.motor_front_right.setPower(wheelSpeeds[1] * speed);
-        robot.motor_rear_left.setPower(-wheelSpeeds[2] * speed);
-        robot.motor_rear_right.setPower(wheelSpeeds[3] * speed);
-    }
-
-    /**
-     * stop controlled drive
-     */
-    public void drive_stop() {
-        // overwrite vx and vz
-        vx = 0;
-        vz = 0;
-        wy = 0;
-        
-        // Stop all motion;
-        drive_setMotors(0, 0, 0, 0);
-
-        // set drive flag
-        drive = false;
-    }
-
-    /**
-     * test if the driving target was reached
-     * @return a Boolean indicating if the target was reached
-     */
-    protected boolean target_reached() {
-        double d = Math.sqrt(Math.pow(target_position_x - position_x, 2) + Math.pow(target_position_z - position_z, 2));
-        if (d <= Math.abs(drive_acc)) {
-            // stop driving
-            drive_stop();
-            target_reached = true;
-        }
-        return target_reached;
-    }
-
-    /**
-     * update position based on motor movement since the last step
-     */
-    protected void stepPos() {
-        // get delta steps
-        double delta_s1 = last_steps_fl - robot.motor_front_left.getCurrentPosition();
-        double delta_s2 = last_steps_fr - robot.motor_front_right.getCurrentPosition();
-        double delta_s3 = last_steps_rl - robot.motor_rear_left.getCurrentPosition();
-        double delta_s4 = last_steps_rr - robot.motor_rear_right.getCurrentPosition();
-
-        // set new last steps for next calculations
-        last_steps_fl -= delta_s1;
-        last_steps_fr -= delta_s2;
-        last_steps_rl -= delta_s3;
-        last_steps_rr -= delta_s4;
-
-        // remove steps from gyro correction
-        delta_s1 -= gyro_correction_steps[0];
-        delta_s2 -= gyro_correction_steps[1];
-        delta_s3 -= gyro_correction_steps[2];
-        delta_s4 -= gyro_correction_steps[3];
-
-        // reset gyro correction steps
-        gyro_correction_steps[0] = 0;
-        gyro_correction_steps[1] = 0;
-        gyro_correction_steps[2] = 0;
-        gyro_correction_steps[3] = 0;
-
-        delta_s1 *= -1;
-        delta_s3 *= -1;
-
-        // calculate the distance
-        double dx = (delta_s1+delta_s2+delta_s3+delta_s4)*R_D_FOUR*TWOPI_D_CPERMREV;
-        double dz = (delta_s1-delta_s2-delta_s3+delta_s4)*R_D_FOUR*TWOPI_D_CPERMREV;
-        /*
-        double dx = (
-               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) -
-                (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
-        double dz = (
-               -(R_D_FOUR*delta_s1*TWOPI_D_CPERMREV) -
-                (R_D_FOUR*delta_s2*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s3*TWOPI_D_CPERMREV) +
-                (R_D_FOUR*delta_s4*TWOPI_D_CPERMREV));
-         */
-
-        // set new position
-        double[] dp = convert_rel2pos(dx,dz);
-        this.position_x -= dp[0];
-        this.position_z -= dp[1];
-    }
-
-    /**
-     * update motor speeds
-     */
-    protected void stepDrive() {
-        if (drive && !target_reached()) {
-            // gyro correction
-            stepGyro();
-
-            // get distance to target
-            vx = target_position_x - position_x;
-            vz = target_position_z - position_z;
-
-            // transform pos2rel
-            double[] rel = convert_pos2rel(vx,vz);
-            vx = rel[0];
-            vz = rel[1];
-        }
-        // set motor speeds
-        drive_setMotors(vx, vz, wy, drive_speed);
-    }
-
-    /**
-     * update wy without driving (only rotating)
-     */
-    public void stepRotate() {
-        stepGyro();
-        step();
-    }
-
-    /**
-     * update rotation speeds
-     */
-    protected void stepGyro() {
-        // get rotation speed
-        rotation_pi_controller.step(target_rotation_y-rotation_y);
-        wy = rotation_pi_controller.out;
-
-        gyro_correction_steps = calculateWheelSpeeds(0,0,wy);
-    }
-
-    /**
-     * update robot rotation
-     */
-    protected void stepRotation() {
-        // get rotation based on the start rotation
-        rotation_y = gyro_start_rotation - gyro.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + start_rotation_y;
-
-        if (rotation_y < -180) {
-            rotation_y = 180 -(rotation_y % 180);
-        } else if (rotation_y > 180) {
-            rotation_y = -180 + (rotation_y % 180);
         }
 
-        rotation_y *= -1;
+        // return if the robot has reached the target position
+        return is_target_reached;
+    }
+
+    public boolean IsDriving() {
+        return is_driving;
     }
 
     /**
-     * step methode which executes step methods
+     * Update robot position based on motor movement (steps).
      */
+    public void step_Position_motorSteps() {
+        // getting delta movement of motors
+        double[] deltaSteps = {
+                motor_steps_last[0] - robot.motor_front_left.getCurrentPosition(),
+                motor_steps_last[1] - robot.motor_front_right.getCurrentPosition(),
+                motor_steps_last[2] - robot.motor_rear_left.getCurrentPosition(),
+                motor_steps_last[3] - robot.motor_rear_left.getCurrentPosition(),
+        };
+
+        // update remembered motor steps.
+        motor_steps_last[0] -= deltaSteps[0];
+        motor_steps_last[1] -= deltaSteps[1];
+        motor_steps_last[2] -= deltaSteps[2];
+        motor_steps_last[3] -= deltaSteps[3];
+
+        // subtract steps from rotation correction
+        deltaSteps[0] -= motor_gyro_correction_steps[0];
+        deltaSteps[1] -= motor_gyro_correction_steps[1];
+        deltaSteps[2] -= motor_gyro_correction_steps[2];
+        deltaSteps[3] -= motor_gyro_correction_steps[3];
+
+        // resetting the gyro correction steps
+        motor_gyro_correction_steps[0] = 0;
+        motor_gyro_correction_steps[1] = 0;
+        motor_gyro_correction_steps[2] = 0;
+        motor_gyro_correction_steps[3] = 0;
+
+        // getting the relative movement
+        double[] deltaMovement = new double[2];
+
+        deltaMovement[0] = (deltaSteps[0]+deltaSteps[1]+deltaSteps[2]+deltaSteps[3]) *
+                R_D_FOUR * TWOPI_D_CMPERREV;
+        deltaMovement[1] = (deltaSteps[0]-deltaSteps[1]-deltaSteps[2]+deltaSteps[3]) *
+                R_D_FOUR * TWOPI_D_CMPERREV;
+
+        // converting relative movement to absolute movement on the field
+        // TODO: deltaMovement = convert...(...[0],...[1]);
+
+        // applying the delta movement
+        position_x += deltaMovement[0];
+        position_z += deltaMovement[1];
+    }
+
+    public void step_Rotation() {
+        // getting rotation
+        rotation_y = start_gyro_rotation - gyro.imu.getAngularOrientation(
+                AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + start_rotation_y;
+
+        // normalize rotation
+        if (rotation_y < -180)
+            rotation_y = 180 -(rotation_y%180);
+        else if (rotation_y > 180)
+            rotation_y = -180 +(rotation_y%180);
+    }
+
+    public void step_RotationCorrection() {
+        // getting the rotation speed base on error
+        gyro_pi_controller.step(target_rotation_y-rotation_y);
+        // TODO add normalization
+        speed_wy = gyro_pi_controller.out;
+
+        // set the gyro correction steps
+        motor_gyro_correction_steps = CalculateWheelSpeeds(0,0,speed_wy);
+    }
+
+    public void step_Drive() {
+        // overwrites speeds before use if the robot is driving autonomous
+        if (is_driving && !IsTargetReached()) {
+            double[] speeds = new double[2];
+            // set speed in direction of the target.
+            speeds[0] = target_position_x - position_x;
+            speeds[1] = target_position_z - position_z;
+
+            // transform pos to rel
+            // TODO pos2rel(speeds)
+            speed_vx = speeds[0];
+            speed_vz = speeds[1];
+        }
+        Drive_setMotorSpeeds(speed_vx, speed_vz, speed_wy, driving_speed);
+    }
+
+    public void step_Speed() {
+        // TODO
+    }
+
     public void step() {
-        stepRotation();
-        stepDrive();
-        stepPos();
-
+        // TODO
     }
 }
