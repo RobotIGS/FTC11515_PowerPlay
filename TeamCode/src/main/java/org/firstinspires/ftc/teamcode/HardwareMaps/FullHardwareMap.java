@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 
 public class FullHardwareMap extends BaseHardwareMap {
     public FullHardwareMap(HardwareMap hwMap) {
@@ -43,5 +44,6 @@ public class FullHardwareMap extends BaseHardwareMap {
 
         motor_lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
          */
+        colorSensor = hwMap.get(NormalizedColorSensor.class, "sensor_color");
     }
 }
