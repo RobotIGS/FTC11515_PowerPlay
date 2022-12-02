@@ -32,6 +32,10 @@ public class FieldNavigation {
     public double position_z;
     public double rotation_y;
 
+    // driving distance for relative driving
+    public double distance_x;
+    public double distance_z;
+
     // moving speeds
     public double speed_vx;
     public double speed_vz;
@@ -39,11 +43,18 @@ public class FieldNavigation {
 
     // driving flags
     private boolean is_driving;
+    private boolean is_driving_relative;
     private boolean is_target_reached;
 
-    // driving targets
+    // driving targets absolute
     private double target_position_x;
     private double target_position_z;
+
+    // driving targets relative
+    private double target_distance_x;
+    private double target_distance_z;
+
+    // rotation target
     private double target_rotation_y;
 
     // driving speeds
@@ -116,6 +127,11 @@ public class FieldNavigation {
      * @param speed max driving speed
      */
     public void Drive_ToPos(double x, double z, double speed) {
+        // set driving flags
+        is_driving = true;
+        is_driving_relative = false;
+
+        // set targets
         target_position_x = x;
         target_position_z = z;
         target_driving_speed = speed;
@@ -128,8 +144,18 @@ public class FieldNavigation {
      * @param speed max driving speed
      */
     public void Drive_RelPos(double x, double z, double speed) {
-        // convert x,z to real coordinates
-        Drive_ToPos(x,z,speed);
+        // set driving flags
+        is_driving = true;
+        is_driving_relative = true;
+
+        // resetting distance the robot drove
+        distance_x = 0;
+        distance_z = 0;
+
+        // set targets
+        target_distance_x = x;
+        target_distance_z = z;
+        target_driving_speed = speed;
     }
 
     /**
@@ -140,8 +166,10 @@ public class FieldNavigation {
      * @param speed speed factor applied to each motor speed.
      */
     protected void Drive_setMotorSpeeds(double vx, double vz, double wy, double speed) {
+        // calculate wheel speeds based on the directional speeds
         double[] wheelSpeeds = CalculateWheelSpeeds(vx,vz,wy);
 
+        // setting the motors to the speeds
         robot.motor_front_left.setPower(wheelSpeeds[0]*speed);
         robot.motor_front_right.setPower(wheelSpeeds[1]*speed);
         robot.motor_rear_left.setPower(wheelSpeeds[2]*speed);
@@ -149,18 +177,29 @@ public class FieldNavigation {
     }
 
     public void Drive_Stop() {
+        // stop driving by resetting the driving flag
         is_driving = false;
     }
 
     public boolean IsTargetReached() {
         // test if the robot already reached the target position
         if (!is_target_reached) {
-            // calculate distance to target position
-            double d = Math.sqrt(
-                    Math.pow(target_position_x - position_x, 2) +
-                    Math.pow(target_position_z - position_z, 2));
+            double d;
+            // calculate distance from target
+            if (is_driving_relative) {
+                // calculate distance to target distance
+                d = Math.sqrt(
+                        Math.pow(target_distance_x - distance_x, 2) +
+                        Math.pow(target_distance_z - distance_z, 2));
+            }
+            else {
+                // calculate distance to target position
+                d = Math.sqrt(
+                        Math.pow(target_position_x - position_x, 2) +
+                        Math.pow(target_position_z - position_z, 2));
+            }
 
-            // test if the robot is in a radius of the target (r=drive_acc)
+            // test if the robot is in a radius of the target
             if (d <= drive_acc) {
                 // setting target reached and stop the robot
                 is_target_reached = true;
@@ -172,8 +211,19 @@ public class FieldNavigation {
         return is_target_reached;
     }
 
+    /**
+     * test if the driving flag is set
+     * @return true if the robot is driving
+     */
     public boolean IsDriving() {
         return is_driving;
+    }
+
+    /**
+     * Update robot position based on robot acceleration (gyro).
+     */
+    public void step_Position_acceleration() {
+        // TODO
     }
 
     /**
@@ -208,11 +258,20 @@ public class FieldNavigation {
 
         // getting the relative movement
         double[] deltaMovement = new double[2];
+        deltaMovement[0] = (
+                deltaSteps[0]+deltaSteps[1]+
+                deltaSteps[2]+deltaSteps[3]
+                ) * R_D_FOUR * TWOPI_D_CMPERREV;
+        deltaMovement[1] = (
+                deltaSteps[0]-deltaSteps[1]-
+                deltaSteps[2]+deltaSteps[3]
+                ) * R_D_FOUR * TWOPI_D_CMPERREV;
 
-        deltaMovement[0] = (deltaSteps[0]+deltaSteps[1]+deltaSteps[2]+deltaSteps[3]) *
-                R_D_FOUR * TWOPI_D_CMPERREV;
-        deltaMovement[1] = (deltaSteps[0]-deltaSteps[1]-deltaSteps[2]+deltaSteps[3]) *
-                R_D_FOUR * TWOPI_D_CMPERREV;
+        // sum up the distance the robot drove
+        if (is_driving_relative) {
+            distance_x += deltaMovement[0];
+            distance_z += deltaMovement[1];
+        }
 
         // converting relative movement to absolute movement on the field
         // TODO: deltaMovement = convert...(...[0],...[1]);
@@ -228,6 +287,7 @@ public class FieldNavigation {
                 AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + start_rotation_y;
 
         // normalize rotation
+        // TODO: move code to static function
         if (rotation_y < -180)
             rotation_y = 180 -(rotation_y%180);
         else if (rotation_y > 180)
@@ -236,9 +296,19 @@ public class FieldNavigation {
 
     public void step_RotationCorrection() {
         // getting the rotation speed base on error
-        gyro_pi_controller.step(target_rotation_y-rotation_y);
-        // TODO add normalization
-        speed_wy = gyro_pi_controller.out;
+        double error = target_rotation_y - rotation_y;
+        // normalize error
+        // TODO: move code to static function
+        if (rotation_y < -180)
+            rotation_y = 180 -(rotation_y%180);
+        else if (rotation_y > 180)
+            rotation_y = -180 +(rotation_y%180);
+
+        // getting the rotation speed from the PI controller
+        gyro_pi_controller.step(error);
+
+        // setting the rotation speed
+        speed_wy = gyro_pi_controller.get();
 
         // set the gyro correction steps
         motor_gyro_correction_steps = CalculateWheelSpeeds(0,0,speed_wy);
@@ -248,15 +318,24 @@ public class FieldNavigation {
         // overwrites speeds before use if the robot is driving autonomous
         if (is_driving && !IsTargetReached()) {
             double[] speeds = new double[2];
-            // set speed in direction of the target.
-            speeds[0] = target_position_x - position_x;
-            speeds[1] = target_position_z - position_z;
+            // getting the driving speed
+            if (is_driving_relative) {
+                speeds[0] = target_distance_x - distance_x;
+                speeds[1] = target_distance_z - distance_z;
+            } else {
+                // set speed in direction of the target.
+                speeds[0] = target_position_x - position_x;
+                speeds[1] = target_position_z - position_z;
 
-            // transform pos to rel
-            // TODO pos2rel(speeds)
+                // transform pos to rel
+                // TODO pos2rel(speeds)
+            }
+
+            // setting the driving speed
             speed_vx = speeds[0];
             speed_vz = speeds[1];
         }
+        // setting motor speeds
         Drive_setMotorSpeeds(speed_vx, speed_vz, speed_wy, driving_speed);
     }
 
