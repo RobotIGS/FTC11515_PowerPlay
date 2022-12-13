@@ -1,16 +1,27 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.FullHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
+import java.util.Date;
+
 
 public abstract class BaseAutonomous extends LinearOpMode {
     private BaseHardwareMap robot;
     private GyroHardwareMap gyro;
     public FieldNavigation navi;
+
+    public void output() {
+        telemetry.addData("x",navi.position_x);
+        telemetry.addData("z",navi.position_z);
+        telemetry.update();
+    }
+
+    public double lift_start_encoder_value;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,21 +32,22 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     private void initialize() {
         robot = new FullHardwareMap(hardwareMap);
+        lift_start_encoder_value  = robot.motor_lift.getCurrentPosition();
         gyro = new GyroHardwareMap(hardwareMap);
         navi = new FieldNavigation(robot, gyro,
-                Quadrant() % 2 == 0 ? -88 : 88,
-                Quadrant() / 2 >= 1 ? -165 : 165,
-                Quadrant() < 2 ? 90 : -90,
-                0.7/180., 0.5
+                Quadrant() % 2 == 0 ? 88 : -88,
+                Quadrant() / 2 >= 1 ? 165 : -165,
+                Quadrant() < 2 ? -90 : 90, // changed
+                0.8/180., 1e-7
+
         );
     }
-
     public int Quadrant() {
         return 0;
     }
 
     private void driveToPosQ(double x, double z, double speed, double acc) {
-        if (Quadrant() % 2 == 0) {
+        if (Quadrant() % 2 == 0) { // change to != 0
             x = -x;
         } if (Quadrant() / 2 >= 1) {
             z = -z;
@@ -73,23 +85,103 @@ public abstract class BaseAutonomous extends LinearOpMode {
         navi.drive_rel(-150,0,0.2,2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
+
+
         }
     }
 
     public void driveToJunctionHigh() {
-        navi.drive_to_pos(155.0, 88.0, 0.2, 0.3);
-        navi.drive_to_pos(155.0,0.0,0.2,0.3);
-        navi.drive_to_pos(82.0,0.0,0.2,0.3);
+        initialize();
 
+        //Close Claw
+        robot.servo1.setPosition(0.4);
+        robot.servo2.setPosition(0.0);
 
-        while (navi.drive && opModeIsActive()) {
-            navi.step();
+        //Wait 1 second
+        long startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
-        navi.drive_to_pos(0.0, 90.0, 0.2, 0.3);
+        //Lift Claw
+        robot.servo3.setPosition(0.3);
+
+        //Wait 1 second again
+        startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        //Drive 10cm forward
+        navi.drive_to_pos(88.0, -160.0, 0.3, 0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
+            output();
         }
+
+        //Drive to x = 0
+        navi.drive_to_pos(0.0,-160.0,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        //Drive next to high junction
+        navi.drive_to_pos(0.0,-85.0,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        //Lift motor arm to junction
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10100);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.motor_lift.setPower(1);
+        while (robot.motor_lift.isBusy() && opModeIsActive()) {
+        }
+
+        //Drive to high junction
+        navi.drive_to_pos(0.0,-82.0,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        //wait again
+        startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        //open claw & let cones
+        robot.servo1.setPosition(0.0);
+        robot.servo2.setPosition(0.4);
+
+
+        //wait 1,5 seconds
+        startTime = (new Date()).getTime();
+        while (startTime+1500 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        //Drive back
+        navi.drive_to_pos(0.0, -84,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        //motor arm in original pos
+        robot.servo1.setPosition(0.4);
+        robot.servo2.setPosition(0.0);
+        robot.servo3.setPosition(0.1);
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 5);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.motor_lift.setPower(1);
+        while (robot.motor_lift.isBusy() && opModeIsActive()) {
+        }
+
+        //wait 1 second
+        startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
     }
 
     public void driveToZone() {
