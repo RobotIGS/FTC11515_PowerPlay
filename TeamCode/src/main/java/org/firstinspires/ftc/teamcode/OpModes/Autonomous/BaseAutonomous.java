@@ -1,9 +1,16 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.HardwareMaps.BaseHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.FullHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
+import org.firstinspires.ftc.teamcode.HardwareMaps.WebcamHardwareMap;
 import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
 
 import java.util.Date;
@@ -44,8 +51,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 Quadrant() % 2 == 0 ? -88 : 88,
                 Quadrant() / 2 >= 1 ? -165 : 165,
                 Quadrant() < 2 ? 90 : -90,
-                0.7/180., 0.5
+                0.7 / 180., 0.5
         );
+    }
+
     protected void initVuforia() {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
@@ -75,9 +84,6 @@ public abstract class BaseAutonomous extends LinearOpMode {
             telemetry.update();
             navi.step();
         }
-    }
-
-    public void detectSignal() {
     }
 
     public void driveToJunctionMid() {
@@ -149,8 +155,6 @@ public abstract class BaseAutonomous extends LinearOpMode {
             telemetry.update();
         }
     }
-
-    protected abstract void initialize();
 
     public void detectSignal() {
         long startTime = (new Date()).getTime();
