@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 public class FullHardwareMap extends BaseHardwareMap {
     public FullHardwareMap(HardwareMap hwMap) {
         super(hwMap);
