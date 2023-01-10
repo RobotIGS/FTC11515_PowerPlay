@@ -1,7 +1,12 @@
 package org.firstinspires.ftc.teamcode.HardwareMaps;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor; // test, ob das ansatt normalized
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 public abstract class BaseHardwareMap {
     public HardwareMap hwMap;
@@ -10,6 +15,7 @@ public abstract class BaseHardwareMap {
     public DcMotor motor_front_left;
     public DcMotor motor_rear_right;
     public DcMotor motor_rear_left;
+    public ColorSensor colorSensor;
 
     public BaseHardwareMap(HardwareMap hwMap) {
         this.hwMap = hwMap;
