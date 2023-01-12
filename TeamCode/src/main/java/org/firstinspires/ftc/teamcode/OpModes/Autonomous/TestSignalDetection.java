@@ -4,11 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
 public class TestSignalDetection extends BaseAutonomous{
-    @Override
-    protected void initialize() {
-        initVuforia();
-        initTFod();
-    }
 
     @Override
     public void run() {

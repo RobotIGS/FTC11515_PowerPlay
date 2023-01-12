@@ -62,7 +62,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 Quadrant() % 2 == 0 ? 88 : -88,
                 Quadrant() / 2 >= 1 ? 165 : -165,
                 Quadrant() < 2 ? -90 : 90, // changed
-                0.8/180., 1e-7
+                0.8/180., 0
 
         );
     }
@@ -111,7 +111,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
     protected void parkTerminal() {
-        navi.drive_rel(-150,0,0.2,2);
+        navi.drive_rel(-150, 0, 0.2, 2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
 
@@ -189,12 +189,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+1500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
+
         //Drive back
-        navi.drive_to_pos(0.0, -84,0.3,0.3);
+        navi.drive_to_pos(0.0, -90,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
+
 
         //motor arm in original pos
         robot.servo1.setPosition(0.4);
@@ -210,21 +212,65 @@ public abstract class BaseAutonomous extends LinearOpMode {
         startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
+        
+        //Lift Claw
+        robot.servo3.setPosition(0.3);
+
+        //wait 1 second
+        startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
 
     }
 
     public void driveToZone() {
-        navi.drive_to_pos(-29.0,90.0,0.2,0.3);
+        double dx = 30;
+        double dz = 60;
+        if (Quadrant() % 2 == 1) {
+            dx *= -1;
+        }
+        if (Quadrant() > 1) {
+            dz *= -1;
+        }
+        // drive to side
+        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.2, 0.1);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+        }
+        // drive forwards
+        navi.drive_to_pos(navi.position_x, navi.position_z + dz, 0.2, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
 
-        navi.drive_to_pos(-88.0,90.0,0.2,0.3);
-        while (navi.drive && opModeIsActive()) {
-            navi.step();
-        }
+        switch (signal_detected) {
+            case 1:
+                dx = 0;
+            case 2:
+                dx = 60;
+            case 3:
+                dx = 120;
+            default:
+                dx = 0;
 
-        navi.drive_to_pos(-149.0,90.0,0.2,0.3);
+        }
+        if (Quadrant() == 1) {
+            if (dx != 60)
+                dx -= 120;
+            else
+                dx = -60;
+        } else if (Quadrant() == 2) {
+            if (dx != 60) {
+                if (dx == 0)
+                    dx = 120;
+                else
+                    dx = 0;
+            }
+        } else if (Quadrant() == 3) {
+            dx *= -1;
+        }
+        //drive to specific zone
+        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.2, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }

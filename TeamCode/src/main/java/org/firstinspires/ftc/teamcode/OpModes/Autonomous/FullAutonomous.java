@@ -8,5 +8,7 @@ public class FullAutonomous extends BaseAutonomous {
     public void run() {
 
         driveToJunctionHigh();
+        signal_detected = 1;
+        driveToZone();
     }
 };
