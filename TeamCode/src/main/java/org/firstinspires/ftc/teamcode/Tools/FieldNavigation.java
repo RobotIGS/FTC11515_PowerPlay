@@ -249,7 +249,7 @@ public class FieldNavigation {
      * @param wy    rotation speed of the robot
      * @param speed speed factor
      */
-    protected void drive_setMotors(double vx, double vz, double wy, double speed) {
+    public void drive_setMotors(double vx, double vz, double wy, double speed) {
         // make sure the speeds are between -1 and 1
         double vmax = Math.max(Math.abs(vx), Math.abs(vz));
         if (vmax > 0) {
@@ -310,7 +310,7 @@ public class FieldNavigation {
     /**
      * update position based on motor movement since the last step
      */
-    protected void stepPos() {
+    public void stepPos() {
         // get delta steps
         double delta_s1 = last_steps_fl - robot.motor_front_left.getCurrentPosition();
         double delta_s2 = last_steps_fr - robot.motor_front_right.getCurrentPosition();
@@ -409,7 +409,7 @@ public class FieldNavigation {
     /**
      * update robot rotation
      */
-    protected void stepRotation() {
+    public void stepRotation() {
         // get rotation based on the start rotation
         rotation_y = gyro_start_rotation - gyro.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + start_rotation_y;
 

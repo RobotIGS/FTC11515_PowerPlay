@@ -152,9 +152,17 @@ public abstract class BaseAutonomous extends LinearOpMode {
             navi.step();
             output();
         }
+        //Drive against wall
+        navi.drive_to_pos(0.0,-170.0,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+        // reset z
+        navi.position_z = Quadrant() < 2 ? -160 : 160;
 
         //Drive next to high junction
-        navi.drive_to_pos(0.0,-85.0,0.3,0.3);
+        navi.drive_to_pos(0.0,-90.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -168,7 +176,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(0.0,-82.0,0.3,0.3);
+        navi.drive_to_pos(0.0,-87.0,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -191,7 +199,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
 
         //Drive back
-        navi.drive_to_pos(0.0, -90,0.3,0.3);
+        navi.drive_to_pos(0.0, -120,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -212,7 +220,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
-        
+
         //Lift Claw
         robot.servo3.setPosition(0.3);
 
@@ -223,9 +231,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     }
 
+
+
     public void driveToZone() {
         double dx = 30;
         double dz = 60;
+
+        //decide what Quadrant for side driving
         if (Quadrant() % 2 == 1) {
             dx *= -1;
         }
@@ -236,13 +248,28 @@ public abstract class BaseAutonomous extends LinearOpMode {
         navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.2, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
+            output();
         }
+
+        // rotate
+        navi.drive_setMotors(0,0,(false?-1:1),0.5);
+        // Quadrant() < 2 ? -90 : 90
+        while(!(
+                navi.rotation_y < (Quadrant() < 2 ? -85 : 95)  &&
+                navi.rotation_y > (Quadrant() < 2 ? -95 : 85)) && opModeIsActive()
+        ) {
+            navi.stepRotation();
+            navi.stepPos();
+        }
+
         // drive forwards
         navi.drive_to_pos(navi.position_x, navi.position_z + dz, 0.2, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
+            output();
         }
 
+        // get value & zone
         switch (signal_detected) {
             case 1:
                 dx = 0;
@@ -252,8 +279,8 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 dx = 120;
             default:
                 dx = 0;
-
         }
+        // drive to specific zone
         if (Quadrant() == 1) {
             if (dx != 60)
                 dx -= 120;
