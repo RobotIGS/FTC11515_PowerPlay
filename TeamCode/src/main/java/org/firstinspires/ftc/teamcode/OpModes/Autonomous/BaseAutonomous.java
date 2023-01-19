@@ -139,30 +139,32 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
-        //Drive 10cm forward
-        navi.drive_to_pos(88.0, -160.0, 0.3, 0.3);
+        //Drive 4cm forward
+        navi.drive_to_pos(88.0, -161.0, 0.3, 0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         //Drive to x = 0
-        navi.drive_to_pos(0.0,-160.0,0.3,0.3);
+        navi.drive_to_pos(-4.0,-161.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         //Drive against wall
-        navi.drive_to_pos(0.0,-170.0,0.3,0.3);
+        navi.drive_to_pos(-4.0,-187.0,0.3,0.2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
-        // reset z
+
+        // reset z,x
         navi.position_z = Quadrant() < 2 ? -160 : 160;
+        navi.position_x = 0;
 
         //Drive next to high junction
-        navi.drive_to_pos(0.0,-90.0,0.3,0.3);
+        navi.drive_to_pos(-2.0,-90.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -176,7 +178,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(0.0,-87.0,0.2,0.3);
+        navi.drive_to_pos(-2.0,-85.0,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -199,7 +201,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
 
         //Drive back
-        navi.drive_to_pos(0.0, -120,0.2,0.3);
+        navi.drive_to_pos(0.0, -110,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -235,7 +237,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     public void driveToZone() {
         double dx = 30;
-        double dz = 60;
+        double dz = 80;
 
         //decide what Quadrant for side driving
         if (Quadrant() % 2 == 1) {
