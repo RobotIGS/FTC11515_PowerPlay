@@ -17,6 +17,7 @@ public class FullControl extends BaseTeleOp {
     public double lift_start_encoder_value;
 
     double wy;
+    public boolean f = false;
 
     @Override
     public void initialize() {
@@ -29,6 +30,9 @@ public class FullControl extends BaseTeleOp {
 
     @Override
     public void loop() {
+        if (f == true && !robot.motor_lift.isBusy()){
+            robot.servo3.setPosition(0.1);
+        }
         if (!gamepad2.left_bumper) {
             if (gamepad1.right_stick_y != 0) {
                 double lift_pos = robot.motor_lift.getCurrentPosition() - lift_start_encoder_value;
@@ -49,7 +53,7 @@ public class FullControl extends BaseTeleOp {
                     }
                 }
             } else if (gamepad1.a) {
-                robot.servo3.setPosition(0.1);
+                f = true;
                 robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 5);
                 robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.motor_lift.setPower(1);
