@@ -139,6 +139,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
+        //Lift motor arm
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.motor_lift.setPower(1);
+
+        while (robot.motor_lift.isBusy() && opModeIsActive()) {
+        }
+
         //Drive 4cm forward
         navi.drive_to_pos(88.0, -161.0, 0.3, 0.3);
         while (navi.drive && opModeIsActive()) {
@@ -147,13 +155,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to x = 0
-        navi.drive_to_pos(-4.0,-161.0,0.3,0.3);
+        navi.drive_to_pos(-6.0,-161.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         //Drive against wall
-        navi.drive_to_pos(-4.0,-187.0,0.3,0.2);
+        navi.drive_to_pos(-6.0,-187.0,0.3,0.2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -164,7 +172,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         navi.position_x = 0;
 
         //Drive next to high junction
-        navi.drive_to_pos(-2.0,-90.0,0.3,0.3);
+        navi.drive_to_pos(0,-90.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -178,7 +186,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(-2.0,-85.0,0.2,0.3);
+        navi.drive_to_pos(0,-85.0,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -212,7 +220,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         robot.servo1.setPosition(0.4);
         robot.servo2.setPosition(0.0);
         robot.servo3.setPosition(0.1);
-        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 5);
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
         robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setPower(1);
         while (robot.motor_lift.isBusy() && opModeIsActive()) {
@@ -265,7 +273,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         // drive forwards
-        navi.drive_to_pos(navi.position_x, navi.position_z + dz, 0.2, 0.1);
+        navi.drive_to_pos(navi.position_x, navi.position_z + dz, 0.4, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -275,10 +283,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
         switch (signal_detected) {
             case 1:
                 dx = 0;
+                break;
             case 2:
                 dx = 60;
+                break;
             case 3:
                 dx = 120;
+                break;
             default:
                 dx = 0;
         }
