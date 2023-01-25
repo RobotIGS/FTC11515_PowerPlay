@@ -34,6 +34,7 @@ public class FullControl extends BaseTeleOp {
     public void loop() {
         if (f == true && !robot.motor_lift.isBusy()){
             robot.servo3.setPosition(0.1);
+            f = false;
         }
         if (!gamepad2.left_bumper) {
             if (gamepad1.right_stick_y != 0) {
@@ -100,9 +101,19 @@ public class FullControl extends BaseTeleOp {
         }
         if (gamepad1.dpad_down) {
             robot.servo3.setPosition(0.1);
+            if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value-500)
+                robot.servo4.setPosition(0);
+            else
+                robot.servo4.setPosition(0.16);
         }
         if (gamepad1.dpad_up)  {
             robot.servo3.setPosition(0.3);
+            if (robot.motor_lift.getCurrentPosition() > lift_start_encoder_value-500) {
+                robot.motor_lift.setTargetPosition((int)lift_start_encoder_value-500);
+                robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.motor_lift.setPower(1);
+            }
+            robot.servo4.setPosition(0.42);
         }
         wy = (gamepad1.left_trigger != 0.0) ? -gamepad1.left_trigger : gamepad1.right_trigger;
 
@@ -111,7 +122,7 @@ public class FullControl extends BaseTeleOp {
 
         // update servoPos
         if (gamepad2.right_stick_y != 0) {
-            servoPos += gamepad2.right_stick_y +0.005;
+            servoPos += gamepad2.right_stick_y *0.003;
         }
         // servoPos in [0;1]
         if (servoPos < 0)
@@ -119,7 +130,7 @@ public class FullControl extends BaseTeleOp {
         if (servoPos > 1)
             servoPos = 1;
         // set servo position
-        robot.servo4.setPosition(servoPos);
+        //robot.servo4.setPosition(servoPos);
         telemetry.addData("x :", navi.position_x);
         telemetry.addData("z :", navi.position_z);
         telemetry.addData("rotY :", navi.rotation_y);
