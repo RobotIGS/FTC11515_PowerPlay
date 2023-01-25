@@ -17,6 +17,8 @@ public abstract class BaseHardwareMap {
     public Servo servo2;
     public Servo servo3;
 
+    public Servo servo4;
+
     public BaseHardwareMap(HardwareMap hwMap) {
         this.hwMap = hwMap;
         init(hwMap);

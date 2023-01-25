@@ -13,6 +13,8 @@ public class FullControl extends BaseTeleOp {
     BaseHardwareMap robot;
     FieldNavigation navi;
     GyroHardwareMap gyro;
+    double servoPos = 0;
+
 
     public double lift_start_encoder_value;
 
@@ -106,10 +108,25 @@ public class FullControl extends BaseTeleOp {
 
         navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.5,(gamepad1.left_bumper || gamepad1.right_bumper) ? 0.75 : 0.5);
         navi.step();
+
+        // update servoPos
+        if (gamepad2.right_stick_y != 0) {
+            servoPos += gamepad2.right_stick_y +0.005;
+        }
+        // servoPos in [0;1]
+        if (servoPos < 0)
+            servoPos = 0;
+        if (servoPos > 1)
+            servoPos = 1;
+        // set servo position
+        robot.servo4.setPosition(servoPos);
         telemetry.addData("x :", navi.position_x);
         telemetry.addData("z :", navi.position_z);
         telemetry.addData("rotY :", navi.rotation_y);
         telemetry.addData("lift :", robot.motor_lift.getCurrentPosition()-lift_start_encoder_value);
+        telemetry.addData("servo:", robot.servo4.getPosition());
         telemetry.update();
     }
+
+
 }
