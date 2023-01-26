@@ -394,13 +394,13 @@ public class FieldNavigation {
      */
     protected void stepGyro() {
         // get rotation speed
-        double err = target_rotation_y - rotation_y;
-        if (err < -180) {
-            err = 180 -(err % 180);
-        } else if (err > 180) {
-            err = -180 + (err % 180);
+        double error = target_rotation_y-rotation_y;
+        if (error < -180) {
+            error = 180 -(error % 180);
+        } else if (error > 180) {
+            error = -180 + (error % 180);
         }
-        rotation_pi_controller.step(err);
+        rotation_pi_controller.step(error);
         wy = rotation_pi_controller.out;
 
         gyro_correction_steps = calculateWheelSpeeds(0,0,wy);
