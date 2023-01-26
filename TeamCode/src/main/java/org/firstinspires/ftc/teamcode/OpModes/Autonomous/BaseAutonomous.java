@@ -120,7 +120,8 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
     public void driveToJunctionHigh() {
-        initialize();
+        int fx = Quadrant()%2==0?1:-1;
+        int fz = Quadrant()<2?-1:1;
 
         //Close Claw
         robot.servo1.setPosition(0.4);
@@ -155,7 +156,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive 4cm forward
-        navi.drive_to_pos(88.0, -161.0, 0.3, 0.3);
+        navi.drive_to_pos(88.0*fx, 161.0*fz, 0.3, 0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -167,24 +168,24 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
 
         //Drive to x = 0
-        navi.drive_to_pos(-8.0,-161.0,0.3,0.3);
+        navi.drive_to_pos(-8.0*fx,161.0*fz,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         //Drive against wall
-        navi.drive_to_pos(-8.0,-187.0,0.3,0.2);
+        navi.drive_to_pos(-8.0*fx,187.0*fz,0.3,0.2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         // reset z,x
-        navi.position_z = Quadrant() < 2 ? -160 : 160;
+        navi.position_z = 160*fz;
         navi.position_x = 0;
 
         //Drive next to high junction
-        navi.drive_to_pos(0,-90.0,0.3,0.3);
+        navi.drive_to_pos(0,90.0*fz,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -198,7 +199,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(0,-82.0,0.1,0.3);
+        navi.drive_to_pos(0,82.0*fz,0.1,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -229,7 +230,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
 
         //Drive back
-        navi.drive_to_pos(0.0, -110,0.2,0.3);
+        navi.drive_to_pos(0.0, 110*fz,0.2,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -262,33 +263,35 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
     public void driveToTerminal(){
+        int fx = Quadrant()%2==0?1:-1;
+        int fz = Quadrant()<2?-1:1;
 
         //Drive back, against wall
-        navi.drive_to_pos(0.0,-187.0,0.3,0.2);
+        navi.drive_to_pos(0.0,187.0*fz,0.3,0.2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         // reset z
-        navi.position_z = Quadrant() < 2 ? -160 : 160;
+        navi.position_z = 160*fz;
         navi.position_x = 0;
 
         // drive 5 cm forward
-        navi.drive_to_pos(0,-152,0.3,0.3);
+        navi.drive_to_pos(0,152*fz,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         // drive to terminal
-        navi.drive_to_pos(180,-152,0.3,0.3);
+        navi.drive_to_pos(180*fx,152*fz,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         //drive back
-        navi.drive_to_pos(180,-170,0.3,0.3);
+        navi.drive_to_pos(180*fx,170*fz,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -313,6 +316,9 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
     public void driveToZone() {
+        int fx = Quadrant()%2==0?1:-1;
+        int fz = Quadrant()<2?-1:1;
+
         double dx = 30;
         double dz = 80;
 
@@ -351,7 +357,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         // drive forwards
-        navi.drive_to_pos(navi.position_x, navi.position_z + dz, 0.4, 0.1);
+        navi.drive_to_pos(navi.position_x*fx, (navi.position_z + dz)*fz, 0.4, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -388,7 +394,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
             dx *= -1;
         }
         //drive to specific zone
-        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.3, 0.1);
+        navi.drive_to_pos((navi.position_x + dx)*fx, navi.position_z*fz, 0.3, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
