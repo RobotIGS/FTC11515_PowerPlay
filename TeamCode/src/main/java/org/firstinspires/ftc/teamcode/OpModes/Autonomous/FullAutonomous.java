@@ -7,12 +7,13 @@ public class FullAutonomous extends BaseAutonomous {
     @Override
     protected void initialize() {
         super.initialize();
-        initVuforia();
-        initTFod();
+        //initVuforia();
+        //initTFod();
     }
     @Override
     public void run() {
-        detectSignal();
+        //detectSignal();
+        signal_detected = 0;
         driveToJunctionHigh();
         driveToZone();
     }

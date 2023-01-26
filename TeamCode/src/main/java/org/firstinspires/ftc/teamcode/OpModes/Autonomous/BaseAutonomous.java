@@ -133,12 +133,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
         //Lift Claw
         robot.servo3.setPosition(0.3);
-        robot.servo4.setPosition(0.42);
 
         //Wait 1 second again
         startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
+
+
 
         //Lift motor arm
         robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
@@ -148,21 +149,31 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (robot.motor_lift.isBusy() && opModeIsActive()) {
         }
 
+        //Wait 1 second
+        startTime = (new Date()).getTime();
+        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
         //Drive 4cm forward
         navi.drive_to_pos(88.0, -161.0, 0.3, 0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
+        startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+
 
         //Drive to x = 0
-        navi.drive_to_pos(-6.0,-161.0,0.3,0.3);
+        navi.drive_to_pos(-8.0,-161.0,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         //Drive against wall
-        navi.drive_to_pos(-6.0,-187.0,0.3,0.2);
+        navi.drive_to_pos(-8.0,-187.0,0.3,0.2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -187,21 +198,21 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(0,-83.0,0.1,0.3);
+        navi.drive_to_pos(0,-82.0,0.1,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         //wait again and let cone down
-        robot.servo3.setPosition(0);
+        robot.servo3.setPosition(0.2);
         //wait 1 seconds
         startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
         //drive back with centring piece
-        robot.servo4.setPosition(0.0);
+        robot.servo4.setPosition(0.16);
         startTime = (new Date()).getTime();
         while (startTime+1500 > (new Date()).getTime() && opModeIsActive()) {
         }
@@ -261,29 +272,55 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
         // reset z
         navi.position_z = Quadrant() < 2 ? -160 : 160;
+        navi.position_x = 0;
 
         // drive 5 cm forward
-        navi.drive_to_pos(0,-155,0.2,0.3);
+        navi.drive_to_pos(0,-152,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
         // drive to terminal
-        navi.drive_to_pos(180,-155,0.2,0.3);
+        navi.drive_to_pos(180,-152,0.3,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
+        //drive back
+        navi.drive_to_pos(180,-170,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        //arm down
+        robot.servo3.setPosition(0.1);
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.motor_lift.setPower(1);
+        while (robot.motor_lift.isBusy() && opModeIsActive()) {
+        }
+
+        robot.servo4.setPosition(0.0);
+
+        //wait 1 second
+        long startTime = (new Date()).getTime();
+        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+
     }
 
     public void driveToZone() {
         double dx = 30;
         double dz = 80;
 
-        if (signal_detected == 0)
-            signal_detected = 1;
-        
+        if (signal_detected == 0) {
+            driveToTerminal();
+            return;
+        }
+
         //decide what Quadrant for side driving
         if (signal_detected == 0){
             driveToTerminal();
