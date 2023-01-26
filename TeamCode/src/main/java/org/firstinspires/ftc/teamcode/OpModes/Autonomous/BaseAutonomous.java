@@ -54,7 +54,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         run();
     }
 
-    private void initialize() {
+    protected void initialize() {
         robot = new FullHardwareMap(hardwareMap);
         lift_start_encoder_value  = robot.motor_lift.getCurrentPosition();
         gyro = new GyroHardwareMap(hardwareMap);
@@ -335,10 +335,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     public void detectSignal() {
         long startTime = (new Date()).getTime();
-        String max_signal;
+        String max_signal = "";
         float max_confidence = 0.0f;
-        while (opModeIsActive()) {// && startTime+5000 > (new Date()).getTime()) {
-            max_signal = "";
+        signal_detected = 0;
+        while (max_confidence < 0.5 && opModeIsActive() && startTime+5000 > (new Date()).getTime()) {
             List<Recognition> updateRecognitions = tfod.getUpdatedRecognitions();
             if (updateRecognitions != null) {
                 telemetry.addData("n", updateRecognitions.size());
@@ -351,15 +351,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
                         max_confidence = recognition.getConfidence();
                     }
                 }
-                for (int i=0; i<SIGNAL_LABELS.length; i++) {
-                    if (max_signal.equals(SIGNAL_LABELS[i])) {
-                        signal_detected = i;
-                        break;
-                    }
-                }
+
             }
-            if (signal_detected != 0)
+        }
+        for (int i=0; i<SIGNAL_LABELS.length; i++) {
+            if (max_signal.equals(SIGNAL_LABELS[i])) {
+                signal_detected = i;
                 break;
+            }
         }
     }
 

@@ -5,10 +5,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous
 public class FullAutonomous extends BaseAutonomous {
     @Override
+    protected void initialize() {
+        super.initialize();
+        initVuforia();
+        initTFod();
+    }
+    @Override
     public void run() {
-
+        detectSignal();
         driveToJunctionHigh();
-        signal_detected = 2;
         driveToZone();
     }
 };
