@@ -422,14 +422,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
         String max_signal = "";
         float max_confidence = 0.0f;
         signal_detected = 0;
-        while (max_confidence < 0.5 && opModeIsActive() && startTime+5000 > (new Date()).getTime()) {
+        while (max_confidence < 0.5 && opModeIsActive() && startTime+4000 > (new Date()).getTime()) {
             List<Recognition> updateRecognitions = tfod.getUpdatedRecognitions();
             if (updateRecognitions != null) {
-                telemetry.addData("n", updateRecognitions.size());
-                telemetry.update();
                 for (Recognition recognition : updateRecognitions) {
+                    telemetry.addData("%s (%f)", recognition.getLabel(), recognition.getConfidence());
                     if (max_signal.equals(recognition.getLabel()))
-                        max_confidence = 0.95f;
+                        max_confidence += 0.10f;
                     else if (recognition.getConfidence() > max_confidence) {
                         max_signal = recognition.getLabel();
                         max_confidence = recognition.getConfidence();
@@ -437,6 +436,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 }
 
             }
+            telemetry.update();
         }
         for (int i=0; i<SIGNAL_LABELS.length; i++) {
             if (max_signal.equals(SIGNAL_LABELS[i])) {
