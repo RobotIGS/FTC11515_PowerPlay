@@ -133,6 +133,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
         //Lift Claw
         robot.servo3.setPosition(0.3);
+        robot.servo4.setPosition(0.42);
 
         //Wait 1 second again
         startTime = (new Date()).getTime();
@@ -186,15 +187,23 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         //Drive to high junction
-        navi.drive_to_pos(0,-85.0,0.2,0.3);
+        navi.drive_to_pos(0,-83.0,0.1,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
-        //wait again
+        //wait again and let cone down
+        robot.servo3.setPosition(0);
+        //wait 1 seconds
         startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        //drive back with centring piece
+        robot.servo4.setPosition(0.0);
+        startTime = (new Date()).getTime();
+        while (startTime+1500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
         //open claw & let cones
@@ -247,6 +256,9 @@ public abstract class BaseAutonomous extends LinearOpMode {
         double dx = 30;
         double dz = 80;
 
+        if (signal_detected == 0)
+            signal_detected = 1;
+        
         //decide what Quadrant for side driving
         if (Quadrant() % 2 == 1) {
             dx *= -1;
@@ -255,7 +267,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
             dz *= -1;
         }
         // drive to side
-        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.2, 0.1);
+        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.3, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -310,7 +322,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
             dx *= -1;
         }
         //drive to specific zone
-        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.2, 0.1);
+        navi.drive_to_pos(navi.position_x + dx, navi.position_z, 0.3, 0.1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
