@@ -241,13 +241,42 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     }
 
+    public void driveToTerminal(){
 
+        //Drive back, against wall
+        navi.drive_to_pos(0.0,-187.0,0.3,0.2);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        // reset z
+        navi.position_z = Quadrant() < 2 ? -160 : 160;
+
+        // drive 5 cm forward
+        navi.drive_to_pos(0,-155,0.2,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
+        // drive to terminal
+        navi.drive_to_pos(180,-155,0.2,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+    }
 
     public void driveToZone() {
         double dx = 30;
         double dz = 80;
 
         //decide what Quadrant for side driving
+        if (signal_detected == 0){
+            driveToTerminal();
+            return;
+        }
         if (Quadrant() % 2 == 1) {
             dx *= -1;
         }
