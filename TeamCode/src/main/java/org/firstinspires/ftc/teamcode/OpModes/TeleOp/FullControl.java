@@ -141,3 +141,8 @@ public class FullControl extends BaseTeleOp {
 
 
 }
+//0.16388
+
+//0.425032
+
+//0.44
