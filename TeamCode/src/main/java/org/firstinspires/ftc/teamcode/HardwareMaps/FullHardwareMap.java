@@ -18,7 +18,6 @@ public class FullHardwareMap extends BaseHardwareMap {
 
     @Override
     public void init(HardwareMap hwMap) {
-        /*
         motor_front_left = hwMap.get(DcMotor.class, "hub1_motorport0");
         motor_front_right = hwMap.get(DcMotor.class, "hub1_motorport1");
         motor_rear_left = hwMap.get(DcMotor.class, "hub1_motorport2");
@@ -28,6 +27,5 @@ public class FullHardwareMap extends BaseHardwareMap {
         servo3 = hwMap.get(Servo.class, "hub1_servoport2");
         servo4 = hwMap.get(Servo.class, "hub1_servoport3");
         motor_lift = hwMap.get(DcMotor.class, "hub2_motorport0");
-         */
     }
 }
