@@ -124,8 +124,19 @@ public class FullControl extends BaseTeleOp {
         }
         wy = (gamepad1.left_trigger != 0.0) ? -gamepad1.left_trigger : gamepad1.right_trigger;
 
-        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.5,(gamepad1.left_bumper || gamepad1.right_bumper) ? 0.75 : 0.5);
+
+        double speed;
+        if (gamepad1.right_bumper){
+            speed = 0.75;
+        }else if (gamepad1.left_bumper){
+            speed = 0.2;
+        }else {
+            speed = 0.5;
+        }
+
+        navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.5, speed);
         navi.step();
+
 
         // update servoPos
         if (gamepad2.right_stick_y != 0) {
