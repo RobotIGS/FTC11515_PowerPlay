@@ -111,11 +111,15 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
     protected void parkTerminal() {
-        navi.drive_rel(-150, 0, 0.2, 2);
+        int fx = Quadrant()%2==0?1:-1;
+        int fz = Quadrant()<2?-1:1;
+        navi.drive_to_pos(-170*fx, 165*fz, 0.2, 2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
-
-
+        }
+        navi.drive_to_pos(-170*fx, 170*fz, 0.2, 2);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
         }
     }
 
