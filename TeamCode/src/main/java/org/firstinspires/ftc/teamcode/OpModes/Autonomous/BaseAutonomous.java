@@ -254,19 +254,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
 
-        //wait 1 second
+        //wait 0.5 second
         startTime = (new Date()).getTime();
-        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
-
-        //Lift Claw
-        robot.servo3.setPosition(0.3);
-
-        //wait 1 second
-        startTime = (new Date()).getTime();
-        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
-        }
-
     }
 
     public void driveToTerminal(){
@@ -314,9 +305,9 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
         robot.servo4.setPosition(0.0);
 
-        //wait 1 second
+        //wait 0.5 second
         long startTime = (new Date()).getTime();
-        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
+        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
 
