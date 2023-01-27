@@ -6,11 +6,13 @@ public class FullAutonomous extends BaseAutonomous {
         super.initialize();
         initVuforia();
         initTFod();
+        telemetry.addLine("init: Done");
+        telemetry.update();
     }
     @Override
     public void run() {
-        detectSignal();
         driveToJunctionHigh();
         driveToZone();
+        navi.drive_setMotors(0,0,0,0);
     }
 };
