@@ -131,23 +131,16 @@ public abstract class BaseAutonomous extends LinearOpMode {
         robot.servo1.setPosition(0.4);
         robot.servo2.setPosition(0.0);
 
-        //Wait 1 second
-        long startTime = (new Date()).getTime();
-        while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
-        }
-
         //Lift Claw
         robot.servo3.setPosition(0.3);
 
         //Wait 1 second again
-        startTime = (new Date()).getTime();
+        long startTime = (new Date()).getTime();
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
-
-
         //Lift motor arm
-        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 600);
         robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setPower(1);
 
@@ -161,30 +154,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
-        //drive forward to detect signal
-        navi.drive_to_pos(navi.position_x, 120*fz,0.3,0.3);
-        while (navi.drive && opModeIsActive()) {
-            navi.step();
-            output();
-        }
-
-        //Drive back to side line 
-        navi.drive_to_pos(88.0*fx, 161.0*fz, 0.3, 0.3);
+        //Drive to x = 0
+        navi.drive_to_pos(-8.0*fx,161.0*fz,0.4,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
         startTime = (new Date()).getTime();
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
-        }
-
-
-
-        //Drive to x = 0
-        navi.drive_to_pos(-8.0*fx,161.0*fz,0.4,0.3);
-        while (navi.drive && opModeIsActive()) {
-            navi.step();
-            output();
         }
         //Drive against wall
         navi.drive_to_pos(-8.0*fx,187.0*fz,0.3,0.2);
@@ -197,25 +174,23 @@ public abstract class BaseAutonomous extends LinearOpMode {
         navi.position_z = 160*fz;
         navi.position_x = 0;
 
-        // drive behind cone spot
-        navi.drive_to_pos(0,110.0*fz,0.3,0.3);
+        startTime = (new Date()).getTime();
+        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        navi.drive_to_pos(0,90*fz,0.35,0.5);
+        while (navi.drive && Math.abs(navi.position_z) >= 100 && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10100);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
         }
 
-        //Drive next to high junction & lift arm
-        navi.drive_to_pos(0,90.0*fz,0.3,0.3);
-        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10100);
-        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.motor_lift.setPower(1);
-        while (robot.motor_lift.isBusy() && navi.drive && opModeIsActive()) {
-            navi.step();
-            output();
-        }
-
         //Drive to high junction
-        navi.drive_to_pos(0,82.0*fz,0.1,0.3);
+        navi.drive_to_pos(0,82.0*fz,0.15,0.3);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -228,11 +203,9 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
-
         //open claw & let cones
         robot.servo1.setPosition(0.0);
         robot.servo2.setPosition(0.4);
-
 
         //wait 0.5seconds
         startTime = (new Date()).getTime();
@@ -241,22 +214,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
 
         //Drive back & arm down & servos back
-        navi.drive_to_pos(0.0, 110*fz,0.2,0.3);
+        navi.drive_to_pos(0.0, 110*fz,0.35,0.5);
         robot.servo1.setPosition(0.4);
         robot.servo2.setPosition(0.0);
         robot.servo3.setPosition(0.1);
         robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
-        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.motor_lift.setPower(1);
-        while (robot.motor_lift.isBusy() && navi.drive && opModeIsActive()) {
+        while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
-        }
-
-
-        //wait 0.5 second
-        startTime = (new Date()).getTime();
-        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
     }
 
@@ -418,6 +383,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
     public void detectSignal() {
         int fz = Quadrant() < 2 ? -1:1;
 
+        //drive forward to detect signal
+        navi.drive_to_pos(navi.position_x, 120*fz,0.3,0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+
         long startTime = (new Date()).getTime();
         String max_signal = "";
         float max_confidence = 0.0f;
@@ -444,9 +416,14 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 break;
             }
         }
-    }
 
-    //public abstract BaseHardwareMap initializeHardwareMap();
+        //Drive back to side line
+        navi.drive_to_pos(navi.position_x, 161.0*fz, 0.3, 0.3);
+        while (navi.drive && opModeIsActive()) {
+            navi.step();
+            output();
+        }
+    }
     
     public abstract void run();
 }
