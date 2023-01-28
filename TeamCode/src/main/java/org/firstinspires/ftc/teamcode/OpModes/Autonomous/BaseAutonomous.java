@@ -116,6 +116,18 @@ public abstract class BaseAutonomous extends LinearOpMode {
         int fx = Quadrant()%2==0?1:-1;
         int fz = Quadrant()<2?-1:1;
 
+        //Close Claw
+        robot.servo1.setPosition(0.4);
+        robot.servo2.setPosition(0.0);
+
+        //Wait 0.5 sec
+        long startTime = (new Date()).getTime();
+        while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
+        }
+
+        //Lift Claw
+        robot.servo3.setPosition(0.3);
+
         robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 1000);
         robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setPower(1);
