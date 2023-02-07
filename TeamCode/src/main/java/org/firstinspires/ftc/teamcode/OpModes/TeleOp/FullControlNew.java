@@ -23,6 +23,7 @@ public class FullControlNew extends BaseTeleOp {
         navi = new FieldNavigation(robot, gyro, 0.0, 0.0, 0.0, 0.0/180, 0.0);
         lift_start_encoder_value  = robot.motor_lift.getCurrentPosition();
     }
+    
 
     @Override
     public void loop() {
@@ -30,7 +31,23 @@ public class FullControlNew extends BaseTeleOp {
         if (gamepad2.left_stick_y != 0.0 && gamepad2.left_stick_x != 0.0) {
             // TODO : drive
             // TODO : lift stuff
-        } else {
+        }
+
+        if (gamepad2.right_stick_y != 0) {
+            if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+                robot.motor_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+            robot.motor_lift.setPower(gamepad2.right_stick_y);
+        }
+
+        else if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+            robot.motor_lift.setTargetPosition(robot.motor_lift.getCurrentPosition());
+            robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motor_lift.setPower(1);
+        }
+
+        else {
             // TODO :  drive
         }
     }
