@@ -58,6 +58,22 @@ public class FullControlNew extends BaseTeleOp {
         else {
             // TODO :  drive
         }
+        if (gamepad1.a) {
+            robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 5);
+            // -5
+        } else if (gamepad1.b) {
+            robot.servo3.setPosition(0.3);
+            robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 3850);
+            // -5100
+        } else if (gamepad1.x) {
+            robot.servo3.setPosition(0.3);
+            robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 6950);
+            // -8050
+        } else if (gamepad1.y) {
+            robot.servo3.setPosition(0.3);
+            robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10400);
+            robot.servo4.setPosition(1.6);
+            // -10400
 
         if (gamepad2.dpad_left) {
             robot.servo1.setPosition(0.0);
@@ -67,6 +83,7 @@ public class FullControlNew extends BaseTeleOp {
             robot.servo2.setPosition(0.0);
             }
 
-    }
+        }
 
+    }
 }
