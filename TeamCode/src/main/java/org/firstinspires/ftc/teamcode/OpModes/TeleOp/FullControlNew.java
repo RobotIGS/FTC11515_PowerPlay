@@ -26,6 +26,13 @@ public class FullControlNew extends BaseTeleOp {
 
     @Override
     public void loop() {
+        // gamepad2 overwrites
+        if (gamepad2.left_stick_y != 0.0 && gamepad2.left_stick_x != 0.0) {
+            // TODO : drive
+            // TODO : lift stuff
+        } else {
+            // TODO :  drive
+        }
     }
 
 }
