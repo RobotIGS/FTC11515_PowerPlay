@@ -27,20 +27,28 @@ public class FullControlNew extends BaseTeleOp {
 
     @Override
     public void loop() {
-        // gamepad2 overwrites
+        /* gamepad2 drive overwrite
+         * gamepad1: slave
+         * gamepad2: master
+         *   - drive slow
+         */
         if (gamepad2.left_stick_y != 0.0 && gamepad2.left_stick_x != 0.0) {
             // TODO : drive
-            // TODO : lift stuff
         }
 
+        /* gampead2 manual lift control
+         *   gamepad1: master
+         *      - drive normal / slow (dep on lift height)
+         *   gamepad2: slave
+         */
         if (gamepad2.right_stick_y != 0) {
-            if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            // set lift motor mode
+            if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_TO_POSITION)
                 robot.motor_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-
+            // set motor lift power
             robot.motor_lift.setPower(gamepad2.right_stick_y);
         }
-
+        // lift reset mode
         else if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             robot.motor_lift.setTargetPosition(robot.motor_lift.getCurrentPosition());
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
