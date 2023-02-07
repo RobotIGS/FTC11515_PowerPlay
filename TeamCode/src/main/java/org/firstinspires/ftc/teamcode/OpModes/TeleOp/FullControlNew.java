@@ -79,6 +79,15 @@ public class FullControlNew extends BaseTeleOp {
             navi.step();
 
         }
+
+        if (gamepad2.dpad_left) {
+            robot.servo1.setPosition(0.0);
+            robot.servo2.setPosition(0.4);
+        } else if (gamepad2.dpad_right) {
+            robot.servo1.setPosition(0.4);
+            robot.servo2.setPosition(0.0);
+            }
+
     }
 
 }
