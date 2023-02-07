@@ -15,6 +15,7 @@ public class FullControlNew extends BaseTeleOp {
     GyroHardwareMap gyro;
 
     public double lift_start_encoder_value;
+    public boolean disable_gamepad1;
 
     double wy;
     double speed;
@@ -37,7 +38,8 @@ public class FullControlNew extends BaseTeleOp {
          */
         if (gamepad2.left_stick_y != 0.0 && gamepad2.left_stick_x != 0.0) {
             speed = 0.25;
-            // TODO : drive
+            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,gamepad2.right_stick_x*0.5, speed);
+            disable_gamepad1 = true;
         }
 
         /* gampead2 manual lift control
@@ -59,24 +61,21 @@ public class FullControlNew extends BaseTeleOp {
             robot.motor_lift.setPower(1);
         }
 
-        else {
-            wy = (gamepad2.right_stick_x);
-
-            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,wy*0.5, speed);
-            navi.step();
-            // TODO : lift stuff
-        } else {
-            if (gamepad1.right_trigger != 0.0) {
-                speed = 0.75;
-            }
-            else {
+        if (!disable_gamepad1) {
+            if (
+                    gamepad1.right_trigger != 0.0 &&
+                    robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value - 4800
+            )
+                speed = 0.5 + gamepad1.right_trigger * 0.25;
+            else if (gamepad1.left_trigger != 0.0)
+                speed = 0.5 - gamepad1.left_trigger * 0.25;
+            else
                 speed = 0.5;
-            }
-            // TODO :  drive
-            wy = (gamepad1.right_stick_x);
+            navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x*0.5, speed);
+        }
 
-            navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.5, speed);
-            navi.step();
+        telemetry.addData("lift pos :", robot.motor_lift.getCurrentPosition());
+        telemetry.addData("claw status :", (robot.servo1.getPosition() == 0)? "opened":"closed");
 
         }
 
@@ -88,6 +87,8 @@ public class FullControlNew extends BaseTeleOp {
             robot.servo2.setPosition(0.0);
             }
 
+        navi.step();
+        telemetry.update();
     }
 
 }
