@@ -16,6 +16,9 @@ public class FullControlNew extends BaseTeleOp {
 
     public double lift_start_encoder_value;
 
+    double wy;
+    double speed;
+
     @Override
     public void initialize() {
         robot = new FullHardwareMap(hardwareMap);
@@ -33,6 +36,7 @@ public class FullControlNew extends BaseTeleOp {
          *   - drive slow
          */
         if (gamepad2.left_stick_y != 0.0 && gamepad2.left_stick_x != 0.0) {
+            speed = 0.25;
             // TODO : drive
         }
 
@@ -56,7 +60,24 @@ public class FullControlNew extends BaseTeleOp {
         }
 
         else {
+            wy = (gamepad2.right_stick_x);
+
+            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,wy*0.5, speed);
+            navi.step();
+            // TODO : lift stuff
+        } else {
+            if (gamepad1.right_trigger != 0.0) {
+                speed = 0.75;
+            }
+            else {
+                speed = 0.5;
+            }
             // TODO :  drive
+            wy = (gamepad1.right_stick_x);
+
+            navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,wy*0.5, speed);
+            navi.step();
+
         }
     }
 
