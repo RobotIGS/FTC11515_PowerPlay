@@ -39,7 +39,7 @@ public class FullControlNew extends BaseTeleOp {
          *   - drive slow
          */
         if (gamepad2.left_stick_y != 0.0 || gamepad2.left_stick_x != 0.0 || gamepad2.left_trigger != 0.0 || gamepad2.right_trigger != 0.0) {
-            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,0.5*(gamepad2.left_trigger!=0?-gamepad2.left_trigger:gamepad2.right_trigger), 0.25);
+            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,(gamepad2.left_trigger!=0?-gamepad2.left_trigger:gamepad2.right_trigger), 0.25);
             disable_gamepad1 = true;
         } else {
             disable_gamepad1 = false;
@@ -65,7 +65,11 @@ public class FullControlNew extends BaseTeleOp {
         }
 
         if (gamepad2.a) {
-            robot.servo3.setPosition(0.3);
+            if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value-4000) {
+                robot.servo1.setPosition(0.4);
+                robot.servo2.setPosition(0.0);
+            }
+            robot.servo3.setPosition(0.0);
             robot.motor_lift.setTargetPosition(lift_start_encoder_value);
         } else if (gamepad2.b) {
             robot.servo3.setPosition(0.3);
@@ -83,6 +87,8 @@ public class FullControlNew extends BaseTeleOp {
                 speed = 0.5 + gamepad1.right_trigger * 0.25;
             else if (gamepad1.left_trigger != 0.0)
                 speed = 0.5 - gamepad1.left_trigger * 0.25;
+            else if (robot.motor_lift.getCurrentPosition() <= lift_start_encoder_value-7000)
+                speed = 0.3;
             else
                 speed = 0.5;
             // auto lift height when fast/norm
