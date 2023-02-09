@@ -25,8 +25,8 @@ public class FullControlNew extends BaseTeleOp {
         navi = new FieldNavigation(robot, gyro, 0.0, 0.0, 0.0, 0.0/180, 0.0);
         // motor lift init stuff
         lift_start_encoder_value  = robot.motor_lift.getCurrentPosition();
-        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setTargetPosition(lift_start_encoder_value);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setPower(1.0);
     }
     
@@ -39,7 +39,7 @@ public class FullControlNew extends BaseTeleOp {
          *   - drive slow
          */
         if (gamepad2.left_stick_y != 0.0 || gamepad2.left_stick_x != 0.0 || gamepad2.left_trigger != 0.0 || gamepad2.right_trigger != 0.0) {
-            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x,(gamepad2.left_trigger!=0?-gamepad2.left_trigger:gamepad2.right_trigger), 0.25);
+            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x, gamepad2.left_trigger!=0.0?-gamepad2.left_trigger:gamepad2.right_trigger,0.25);
             disable_gamepad1 = true;
         } else {
             disable_gamepad1 = false;
@@ -65,7 +65,7 @@ public class FullControlNew extends BaseTeleOp {
         }
 
         if (gamepad2.a) {
-            if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value-4000) {
+            if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value-3000) {
                 robot.servo1.setPosition(0.4);
                 robot.servo2.setPosition(0.0);
             }
@@ -87,8 +87,8 @@ public class FullControlNew extends BaseTeleOp {
                 speed = 0.5 + gamepad1.right_trigger * 0.25;
             else if (gamepad1.left_trigger != 0.0)
                 speed = 0.5 - gamepad1.left_trigger * 0.25;
-            else if (robot.motor_lift.getCurrentPosition() <= lift_start_encoder_value-7000)
-                speed = 0.3;
+            else if (robot.motor_lift.getCurrentPosition() <= lift_start_encoder_value-6500)
+                speed = 0.25;
             else
                 speed = 0.5;
             // auto lift height when fast/norm
@@ -96,7 +96,7 @@ public class FullControlNew extends BaseTeleOp {
                 robot.motor_lift.setTargetPosition(lift_start_encoder_value - 550);
             navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x*0.5, speed);
         } // reset drive
-        else if (gamepad2.left_stick_x == 0 && gamepad2.left_stick_y == 0)
+        else if (gamepad2.left_stick_x == 0 && gamepad2.left_stick_y == 0 && gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0)
             navi.drive_setSpeed(0,0,0,0);
 
         /* gamepad2 open/close claw
