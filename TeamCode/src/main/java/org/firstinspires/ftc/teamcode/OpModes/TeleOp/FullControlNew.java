@@ -96,24 +96,32 @@ public class FullControlNew extends BaseTeleOp {
                 robot.motor_lift.setTargetPosition(lift_start_encoder_value - 550);
             navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x*0.5, speed);
         } // reset drive
-        else if (gamepad2.left_stick_x == 0 && gamepad2.left_stick_y == 0 && gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0)
+        else if (gamepad2.left_stick_x == 0 && gamepad2.left_stick_y == 0 && gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0)
             navi.drive_setSpeed(0,0,0,0);
 
         /* gamepad2 open/close claw
          *
          */
-        if (gamepad2.dpad_left) {
+        if (gamepad2.dpad_up) {
+            robot.servo3.setPosition(0.3);
+        } else if (gamepad2.dpad_down) {
+            robot.servo4.setPosition(0.16);
+            robot.servo3.setPosition(0.0);
+        } else if (gamepad2.dpad_left) {
             robot.servo1.setPosition(0.0);
             robot.servo2.setPosition(0.4);
         } else if (gamepad2.dpad_right) {
             robot.servo1.setPosition(0.4);
             robot.servo2.setPosition(0.0);
         }
-        if (gamepad2.dpad_up) {
-            robot.servo3.setPosition(0.3);
-        } else if (gamepad2.dpad_down) {
-            robot.servo3.setPosition(0.0);
-        }
+
+        // servo 4
+        if (robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value-500)
+            robot.servo4.setPosition(0.0);
+        else if (robot.servo3.getPosition() == 0.0)
+            robot.servo4.setPosition(0.16);
+        else if (robot.servo4.getPosition() != 0.42)
+            robot.servo4.setPosition(0.42);
 
         telemetry.addData("lift pos :", "%d (%s)", robot.motor_lift.getCurrentPosition(), (robot.motor_lift.getMode()==DcMotor.RunMode.RUN_TO_POSITION)?"POS":"ENC");
         telemetry.addData("claw status :", (robot.servo1.getPosition() == 0)? "opened":"closed");
