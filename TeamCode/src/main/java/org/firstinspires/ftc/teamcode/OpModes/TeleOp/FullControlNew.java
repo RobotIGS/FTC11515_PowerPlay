@@ -39,7 +39,11 @@ public class FullControlNew extends BaseTeleOp {
          *   - drive slow
          */
         if (gamepad2.left_stick_y != 0.0 || gamepad2.left_stick_x != 0.0 || gamepad2.left_trigger != 0.0 || gamepad2.right_trigger != 0.0) {
-            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x, gamepad2.left_trigger!=0.0?-gamepad2.left_trigger:gamepad2.right_trigger,0.25);
+            if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value - 6000) // slow down if the lift is up
+                speed = 0.18;
+            else
+                speed = 0.25;
+            navi.drive_setSpeed(gamepad2.left_stick_y,gamepad2.left_stick_x, gamepad2.left_trigger!=0.0?-gamepad2.left_trigger:gamepad2.right_trigger,speed);
             disable_gamepad1 = true;
         } else {
             disable_gamepad1 = false;
@@ -57,32 +61,36 @@ public class FullControlNew extends BaseTeleOp {
             // set motor lift power
             robot.motor_lift.setPower(gamepad2.right_stick_y);
         }
-        // lift reset mode
+        // lift reset mode (to make the lift hold its position)
         else if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             robot.motor_lift.setTargetPosition(robot.motor_lift.getCurrentPosition());
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.motor_lift.setPower(1.0);
         }
 
-        if (gamepad2.a) {
+        /* automate lift heights
+         */
+        if (gamepad2.a) { // down
             if (robot.motor_lift.getCurrentPosition() < lift_start_encoder_value-3000) {
                 robot.servo1.setPosition(0.4);
                 robot.servo2.setPosition(0.0);
             }
             robot.servo3.setPosition(0.0);
             robot.motor_lift.setTargetPosition(lift_start_encoder_value);
-        } else if (gamepad2.b) {
+        } else if (gamepad2.b) { // low
             robot.servo3.setPosition(0.3);
             robot.motor_lift.setTargetPosition(lift_start_encoder_value - 3850);
-        } else if (gamepad2.x) {
+        } else if (gamepad2.x) { // mid
             robot.servo3.setPosition(0.3);
             robot.motor_lift.setTargetPosition(lift_start_encoder_value - 6950);
-        } else if (gamepad2.y) {
+        } else if (gamepad2.y) { // high
             robot.servo3.setPosition(0.3);
             robot.motor_lift.setTargetPosition(lift_start_encoder_value - 10000);
         }
 
+        // driving (gamepad1)
         if (!disable_gamepad1) {
+            // change max speed
             if (gamepad1.right_trigger != 0.0 && robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value - 4800)
                 speed = 0.5 + gamepad1.right_trigger * 0.25;
             else if (gamepad1.left_trigger != 0.0)
@@ -95,7 +103,7 @@ public class FullControlNew extends BaseTeleOp {
             if ((gamepad1.left_stick_y!=0.0 || gamepad1.left_stick_x!=0.0 && speed >= 0.5) && Math.max(robot.motor_lift.getCurrentPosition(), robot.motor_lift.getTargetPosition()) >= lift_start_encoder_value - 500)
                 robot.motor_lift.setTargetPosition(lift_start_encoder_value - 550);
             navi.drive_setSpeed(gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x*0.5, speed);
-        } // reset drive
+        } // reset drive speed
         else if (gamepad2.left_stick_x == 0 && gamepad2.left_stick_y == 0 && gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0)
             navi.drive_setSpeed(0,0,0,0);
 
@@ -118,7 +126,7 @@ public class FullControlNew extends BaseTeleOp {
         // servo 4
         if (robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value-500)
             robot.servo4.setPosition(0.0);
-        else if (robot.servo3.getPosition() == 0.0)
+        else if (robot.servo3.getPosition() == 0.0 || robot.servo1.getPosition() != 0.4)
             robot.servo4.setPosition(0.16);
         else if (robot.servo4.getPosition() != 0.42)
             robot.servo4.setPosition(0.42);
