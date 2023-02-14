@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Tools;
 
 public class PIController {
-    private double integral = 0;
+    public double integral = 0;
 
     private double p;
     private double i;

@@ -56,14 +56,28 @@ public class FullControlNew extends BaseTeleOp {
          */
         if (gamepad2.right_stick_y != 0) {
             // set lift motor mode
-            if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_TO_POSITION)
-                robot.motor_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            // set motor lift power
-            robot.motor_lift.setPower(gamepad2.right_stick_y);
+            if (!gamepad1.dpad_down && robot.motor_lift.getCurrentPosition() <= lift_start_encoder_value && robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value - 10200 )
+            {
+                if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_TO_POSITION)
+                    robot.motor_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                // set motor lift power
+                robot.motor_lift.setPower(gamepad2.right_stick_y);
+            }
         }
         // lift reset mode (to make the lift hold its position)
         else if (robot.motor_lift.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
-            robot.motor_lift.setTargetPosition(robot.motor_lift.getCurrentPosition());
+            if(gamepad2.left_bumper && gamepad1.dpad_up){
+                lift_start_encoder_value = robot.motor_lift.getCurrentPosition();
+            }
+            if (!gamepad1.dpad_up && robot.motor_lift.getCurrentPosition() < lift_start_encoder_value - 10200){
+                robot.motor_lift.setTargetPosition(lift_start_encoder_value - 10200);
+            }
+            else if (!gamepad1.dpad_up && robot.motor_lift.getCurrentPosition() > lift_start_encoder_value){
+                robot.motor_lift.setTargetPosition(lift_start_encoder_value);
+            }
+            else {
+                robot.motor_lift.setTargetPosition(robot.motor_lift.getCurrentPosition());
+            }
             robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.motor_lift.setPower(1.0);
         }

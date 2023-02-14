@@ -12,7 +12,7 @@ public class FieldNavigation {
     // robot object
     protected BaseHardwareMap robot;
     protected GyroHardwareMap gyro;
-    protected PIController rotation_pi_controller;
+    public PIController rotation_pi_controller;
 
     // statics
     protected static final double COUNTS_PER_MOTOR_REV = 751.8; // 223rpm

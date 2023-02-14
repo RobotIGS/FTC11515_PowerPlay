@@ -64,7 +64,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 Quadrant() % 2 == 0 ? 88 : -88,
                 Quadrant() / 2 >= 1 ? 165 : -165,
                 Quadrant() < 2 ? -90 : 90, // changed
-                1/180., 1e-4
+                1.5/180., 1.5e-5
 
         );
     }
@@ -97,6 +97,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
             telemetry.update();
             navi.step();
         }
+
     }
 
     public void driveToJunctionMid() {
@@ -112,9 +113,12 @@ public abstract class BaseAutonomous extends LinearOpMode {
         // lift down
     }
 
-    protected void parkTerminal() {
+    protected void parkTerminal(boolean t) {
         int fx = Quadrant()%2==0?1:-1;
         int fz = Quadrant()<2?-1:1;
+
+        if (t && (Quadrant() == 1 || Quadrant() == 2))
+            fx *= -1;
 
         //Close Claw
         robot.servo1.setPosition(0.4);
@@ -134,11 +138,11 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (robot.motor_lift.isBusy() && opModeIsActive()) {
         }
 
-        navi.drive_to_pos(170*fx, 165*fz, 0.35, 2);
+        navi.drive_to_pos(180*fx, 165*fz, 0.35, 2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
-        navi.drive_to_pos(170*fx, 170*fz, 0.35, 2);
+        navi.drive_to_pos(180*fx, 170*fz, 0.35, 2);
         while (navi.drive && opModeIsActive()) {
             navi.step();
         }
@@ -204,7 +208,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
         //Drive against wall
-        navi.drive_to_pos(-10.0*fx,182.0*fz,0.3,0.2);
+        navi.drive_to_pos(-10.0*fx,182.0*fz,0.35,1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -213,6 +217,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         // reset z,x
         navi.position_z = 160*fz;
         navi.position_x = 0;
+        navi.rotation_pi_controller.integral = 0;
 
         startTime = (new Date()).getTime();
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
@@ -255,6 +260,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
+        navi.rotation_pi_controller.integral = 0;
 
         //Drive back & arm down & servos back
         navi.drive_to_pos(0.0, 110*fz,0.35,0.5);
@@ -273,7 +279,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         int fz = Quadrant()<2?-1:1;
 
         //Drive back, against wall
-        navi.drive_to_pos(0.0,172.0*fz,0.3,0.5);
+        navi.drive_to_pos(0.0,170.0*fz,0.37,1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
@@ -291,7 +297,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
 
         // drive to terminal
-        navi.drive_to_pos(180*fx,180*fz,0.55,0.3);
+        navi.drive_to_pos(180*fx,180*fz,0.55,1);
         while (navi.drive && opModeIsActive()) {
             navi.step();
             output();
