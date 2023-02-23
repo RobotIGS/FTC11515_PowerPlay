@@ -13,6 +13,10 @@ import org.firstinspires.ftc.teamcode.HardwareMaps.FullHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.WebcamHardwareMap;
 import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
+import org.firstinspires.ftc.teamcode.Tools.SignalDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+
 import java.util.Date;
 
 import java.util.Date;
@@ -36,6 +40,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
+    protected SignalDetection cv_signal_detector;
 
     public int signal_detected;
 
@@ -75,6 +80,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
         parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+    protected void initCVSignalDetection(){
+       OpenCvCamera phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"));
+       cv_signal_detector = new SignalDetection(phoneCam);
     }
     public int Quadrant() {
         return 0;

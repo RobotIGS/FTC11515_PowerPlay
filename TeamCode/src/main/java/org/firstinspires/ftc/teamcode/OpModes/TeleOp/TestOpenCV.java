@@ -87,14 +87,17 @@ public class TestOpenCV extends BaseTeleOp {
             int green_det = 0;
             int blue_det = 0;
             int not_det = 0;
-            int s;
             for (int i = 0; i <= 5; i++) {
-                s = Math.max((int) pipeline.meancolor.val[0], Math.max((int) pipeline.meancolor.val[1], (int) pipeline.meancolor.val[2]));
-                if (s == (int) pipeline.meancolor.val[0]) {
+                int red = (int) pipeline.meancolor.val[0];
+                int green = (int) pipeline.meancolor.val[1];
+                int blue = (int) pipeline.meancolor.val[2];
+
+                int s = Math.max(red, Math.max(green, blue));
+                if (s == red) {
                     red_det += 1;
-                } else if (s == (int) pipeline.meancolor.val[1]) {
+                } else if (s == green) {
                     green_det += 1;
-                } else if (s == (int) pipeline.meancolor.val[2]) {
+                } else if (s == blue) {
                     blue_det += 1;
                 } else {
                     not_det += 1;
@@ -102,12 +105,21 @@ public class TestOpenCV extends BaseTeleOp {
                 startTime = (new Date()).getTime();
                 while (startTime + 200 > (new Date()).getTime()) {
                 }
+                int s2 = Math.max(Math.max(red_det, green_det), Math.max(blue_det, not_det));
+                if(s2 >= 3){
+                    if (s2 == red_det) {
 
-            }
-            if(Math.max(Math.max(red_det, green_det), Math.max(blue_det, not_det)) >= 3){
-                switch (Math.max(Math.max(red_det, green_det), Math.max(blue_det, not_det))){
+                        //drive to parking zone two
+                    } else if (s2 == green_det) {
+                        //drive to parking zone three
+                         } else if (s2 == blue_det) {
+                        //drive to parking zone one
+                    }
+                    else {
+                        //drive in terminal
+                    }
 
-                    case red_det:
+
 
                 }
 
