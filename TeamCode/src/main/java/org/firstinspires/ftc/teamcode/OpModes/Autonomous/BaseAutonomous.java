@@ -467,6 +467,46 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
         robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 600);
     }
-    
+
+    public void detectSignalCV() {
+        int zero = 0;
+        int one = 0;
+        int two = 0;
+        int three = 0;
+        int c;
+
+        for ( int i = 0; i < 10; i++) {
+            c = cv_signal_detector.detect(42);
+
+            switch (c) {
+                case 3:
+                    three ++;
+                    break;
+                case 2:
+                    two ++;
+                    break;
+                case 1:
+                    one ++;
+                    break;
+                default:
+                    zero ++;
+                    break;
+            }
+        }
+
+        int a = (Math.max(zero, one));
+        int b = (Math.max(two, three));
+
+        if (a > b) {
+            signal_detected = (zero > one? 0 : 1);
+        } else {
+            signal_detected = (three > two? 3 : 2);
+        }
+
+
+    }
+
+
+
     public abstract void run();
 }

@@ -12,7 +12,7 @@ public class FullAutonomous extends BaseAutonomous {
     }
     @Override
     public void run() {
-        cv_signal_detector.detect();
+        detectSignalCV();
         driveToJunctionHigh();
         driveToZone();
         navi.drive_setMotors(0,0,0,0);

@@ -25,7 +25,45 @@ public class SignalDetection {
 
     }
 
-    public void detect() {
+    public int detect(double min_d) {
+
+        double blue  = pipeline.meancolor.val[2];
+        double red   = pipeline.meancolor.val[0];
+        double green = pipeline.meancolor.val[1];
+        double color_sum = 0;
+        int color_max = 0;
+
+        if (red > green){
+            color_max = 2;
+        } else{
+            color_max = 3;
+        }
+        if ((color_max == 2? red : green) < blue){
+            color_max = 1;
+        }
+        // m - d = (a + b) / 2
+
+        color_sum += (color_max == 1? -blue : blue/2);
+        color_sum += (color_max == 2? -red : red/2);
+        color_sum += (color_max == 3? -green : green/2);
+        color_sum += min_d;
+
+        if (color_sum > 0)
+            color_max = 0;
+
+        return color_max;
+
+
+
+
+
+
+
+
+
+
+
+        /*
         int red_det = 0;
         int green_det = 0;
         int blue_det = 0;
@@ -48,27 +86,23 @@ public class SignalDetection {
             long startTime = (new Date()).getTime();
             while (startTime + 200 > (new Date()).getTime()) {
             }
-            int s2 = Math.max(Math.max(red_det, green_det), Math.max(blue_det, not_det));
-            if(s2 >= 3){
-                if (s2 == red_det) {
+        }
+        int s2 = Math.max(Math.max(red_det, green_det), Math.max(blue_det, not_det));
+        if(s2 >= 3){
+            if (s2 == green_det) {
+                return 3;
 
-                    //drive to parking zone two
-                } else if (s2 == green_det) {
-                    //drive to parking zone three
-                } else if (s2 == blue_det) {
-                    //drive to parking zone one
-                }
-                else {
-                    //drive in terminal
-                }
+            } else if (s2 == red_det) {
+                return 2;
 
-
-
+            } else if (s2 == blue_det) {
+                return 1;
             }
 
-
-
         }
+        return 0;
+        
+         */
     }
 }
 
