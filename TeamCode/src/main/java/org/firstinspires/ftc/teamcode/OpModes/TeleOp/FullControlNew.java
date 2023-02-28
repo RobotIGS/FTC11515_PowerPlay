@@ -140,7 +140,7 @@ public class FullControlNew extends BaseTeleOp {
         // servo 4
         if (robot.motor_lift.getCurrentPosition() >= lift_start_encoder_value-500)
             robot.servo4.setPosition(0.0);
-        else if (robot.servo3.getPosition() == 0.0 || robot.servo1.getPosition() != 0.4)
+        else if (robot.servo3.getPosition() == 0.0 || robot.servo1.getPosition() == 0.0)
             robot.servo4.setPosition(0.16);
         else if (robot.servo4.getPosition() != 0.42)
             robot.servo4.setPosition(0.42);
