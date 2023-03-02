@@ -83,6 +83,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
     protected void initCVSignalDetection(){
        OpenCvCamera phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"));
+       //           phoneCam = OpenCvCameraFactory.getInstance().createWebcam(webcamHardwareMap.webcam);
        cv_signal_detector = new SignalDetection(phoneCam);
     }
     public int Quadrant() {
@@ -156,10 +157,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         }
     }
 
-    public void driveToJunctionHigh() {
-        int fx = Quadrant() % 2 == 0 ? 1:-1;
-        int fz = Quadrant() < 2 ? -1:1;
-
+    protected void initDriveAfterStart() {
         //Close Claw
         robot.servo1.setPosition(0.4);
         robot.servo2.setPosition(0.0);
@@ -177,17 +175,20 @@ public abstract class BaseAutonomous extends LinearOpMode {
         while (startTime+1000 > (new Date()).getTime() && opModeIsActive()) {
         }
 
+        robot.servo4.setPosition(0.16);
+    }
+    public void driveToJunctionHigh() {
+        int fx = Quadrant() % 2 == 0 ? 1:-1;
+        int fz = Quadrant() < 2 ? -1:1;
+
         //Lift motor arm
-        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 800);
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 400);
         robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.motor_lift.setPower(1);
         while (robot.motor_lift.isBusy() && opModeIsActive()) {
         }
-        robot.servo4.setPosition(0.16);
 
-        detectSignal();
-
-        startTime = (new Date()).getTime();
+        long startTime = (new Date()).getTime();
         while (startTime+500 > (new Date()).getTime() && opModeIsActive()) {
         }
 
@@ -429,6 +430,13 @@ public abstract class BaseAutonomous extends LinearOpMode {
     public void detectSignal() {
         int fz = Quadrant()<2?-1:1;
 
+        //Lift motor arm
+        robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 800);
+        robot.motor_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.motor_lift.setPower(1);
+        while (robot.motor_lift.isBusy() && opModeIsActive()) {
+        }
+
         long startTime = (new Date()).getTime();
         String max_signal = "";
         float max_confidence = 0.0f;
@@ -476,7 +484,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
         int c;
 
         for ( int i = 0; i < 10; i++) {
-            c = cv_signal_detector.detect(42);
+            c = cv_signal_detector.detect(0);
 
             switch (c) {
                 case 3:

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
-import java.util.Date;
-
 public class FullAutonomous extends BaseAutonomous {
     @Override
     protected void initialize() {
@@ -15,16 +13,11 @@ public class FullAutonomous extends BaseAutonomous {
     @Override
     public void run() {
         detectSignalCV();
-        detectSignal
         telemetry.addData("signal_detected :", signal_detected);
         telemetry.update();
-        long start_time = (new Date()).getTime();
-        while (start_time+5000 > (new Date()).getTime()) {
-        }
-        /*
+        initDriveAfterStart();
         driveToJunctionHigh();
         driveToZone();
         navi.drive_setMotors(0,0,0,0);
-         */
     }
 };
