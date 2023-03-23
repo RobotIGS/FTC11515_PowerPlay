@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.WebcamHardwareMap;
 import org.firstinspires.ftc.teamcode.OpModes.TeleOp.BaseTeleOp;
 import org.firstinspires.ftc.teamcode.OpModes.TeleOp.TestOpenCV;
-import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
 import org.firstinspires.ftc.teamcode.Tools.JunctionDrive;
+import org.firstinspires.ftc.teamcode.Tools.JUNCTION_DRIVE;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
@@ -36,10 +36,10 @@ public class TestJunctionDrive extends BaseTeleOp {
         telemetry.addData("","%3.2f %3.2f %3.2f (R)", junctiondrive.pipeline.returnScalars[2].val[0],junctiondrive.pipeline.returnScalars[2].val[1],junctiondrive.pipeline.returnScalars[2].val[2]);
         telemetry.update();
 
-        /*
         switch (junctiondrive.step()) {
+            case (DRIVE_FORW):
+                break;
         }
-         */
 
         while (startT+200 > (new Date()).getTime()) {}
     }

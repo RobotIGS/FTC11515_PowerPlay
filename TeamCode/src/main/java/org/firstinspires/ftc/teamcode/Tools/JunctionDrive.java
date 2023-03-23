@@ -12,24 +12,6 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Date;
 
-enum JUNCTION_DRIVE {
-    ROT_RIGHT,
-    ROT_LEFT,
-    DRIVE_FORW,
-    SCORE,
-    END2,
-    SKIP
-};
-
-enum JUNCTION_DRIVE_STATE {
-    START,
-    ROT00,
-    ROT01,
-    ROT10,
-    ROT11,
-    FOR
-}
-
 public class JunctionDrive {
     public JunctionOpenCVPipeline pipeline;
 
