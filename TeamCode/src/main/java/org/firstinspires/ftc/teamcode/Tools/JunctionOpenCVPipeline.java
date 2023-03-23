@@ -10,9 +10,9 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class JunctionOpenCVPipeline extends OpenCvPipeline {
     Mat output;
-    int rect_sizex = 30;
-    int rect_sizey = 40;
-    int rect_side_sizex = 10;
+    int rect_sizex = 45;
+    int rect_sizey = 50;
+    int rect_side_sizex = 20;
     int rect_dx = 0; // 20
     int rect_dy = 0; // -25;
     private Rect cropRectR;
@@ -43,12 +43,27 @@ public class JunctionOpenCVPipeline extends OpenCvPipeline {
         cropRectM = new Rect(p2,p3);
         cropRectR = new Rect(p3,p4);
 
-        Imgproc.rectangle(output, p1, p2, rect_colorL, 4);
-        Imgproc.rectangle(output, p2, p3, rect_colorM, 4);
-        Imgproc.rectangle(output, p3, p4, rect_colorR, 4);
         returnScalars[0] = Core.mean(input.submat(cropRectL));
         returnScalars[1] = Core.mean(input.submat(cropRectM));
         returnScalars[2] = Core.mean(input.submat(cropRectR));
+
+
+        if (returnScalars[0].val[0] > 200) {
+            Imgproc.rectangle(output, p1, p2, rect_colorL, -1);
+        } else {
+            Imgproc.rectangle(output, p1, p2, rect_colorL, 2);
+        }
+        if (returnScalars[1].val[0] > 200) {
+            Imgproc.rectangle(output, p2, p3, rect_colorM, -1);
+        } else {
+            Imgproc.rectangle(output, p2, p3, rect_colorM, 2);
+        }
+        if (returnScalars[2].val[0] > 200) {
+            Imgproc.rectangle(output, p3, p4, rect_colorR, -1);
+        } else {
+            Imgproc.rectangle(output, p3, p4, rect_colorR, 2);
+        }
+
         return output;
     }
 

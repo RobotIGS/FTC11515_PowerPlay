@@ -30,12 +30,18 @@ public class TestJunctionDrive extends BaseTeleOp {
 
     @Override
     public void loop() {
-        telemetry.addData("","%3.2f %3.2f %3.2f (L)", junctiondrive.pipeline.returnScalars[0].val[0],junctiondrive.pipeline.returnScalars[0].val[0],junctiondrive.pipeline.returnScalars[0].val[0]);
-        telemetry.addData("","%3.2f %3.2f %3.2f (M)", junctiondrive.pipeline.returnScalars[1].val[0],junctiondrive.pipeline.returnScalars[1].val[0],junctiondrive.pipeline.returnScalars[1].val[0]);
-        telemetry.addData("","%3.2f %3.2f %3.2f (R)", junctiondrive.pipeline.returnScalars[2].val[0],junctiondrive.pipeline.returnScalars[2].val[0],junctiondrive.pipeline.returnScalars[2].val[0]);
-        telemetry.update();
         long startT = (new Date()).getTime();
-        while (startT+1000 > (new Date()).getTime()) {}
+        telemetry.addData("","%3.2f %3.2f %3.2f (L)", junctiondrive.pipeline.returnScalars[0].val[0],junctiondrive.pipeline.returnScalars[0].val[1],junctiondrive.pipeline.returnScalars[0].val[2]);
+        telemetry.addData("","%3.2f %3.2f %3.2f (M)", junctiondrive.pipeline.returnScalars[1].val[0],junctiondrive.pipeline.returnScalars[1].val[1],junctiondrive.pipeline.returnScalars[1].val[2]);
+        telemetry.addData("","%3.2f %3.2f %3.2f (R)", junctiondrive.pipeline.returnScalars[2].val[0],junctiondrive.pipeline.returnScalars[2].val[1],junctiondrive.pipeline.returnScalars[2].val[2]);
+        telemetry.update();
+
+        /*
+        switch (junctiondrive.step()) {
+        }
+         */
+
+        while (startT+200 > (new Date()).getTime()) {}
     }
 
 
