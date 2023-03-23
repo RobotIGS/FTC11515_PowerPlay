@@ -38,7 +38,24 @@ public class TestJunctionDrive extends BaseTeleOp {
 
         switch (junctiondrive.step()) {
             case (DRIVE_FORW):
+                telemetry.addLine("Foward");
                 break;
+            case (END2):
+                telemetry.addLine("Parking");
+                break;
+            case (ROT_LEFT):
+                telemetry.addLine("Rotate 20° left");
+                break;
+            case (ROT_RIGHT):
+                telemetry.addLine("Rotate 20° Right");
+                break;
+            case (SCORE):
+                telemetry.addLine("Place cone on junction");
+                break;
+            case (SKIP):
+                telemetry.addLine("Nothing");
+                break;
+
         }
 
         while (startT+200 > (new Date()).getTime()) {}
