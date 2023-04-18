@@ -17,6 +17,8 @@ public class JunctionDrive {
 
     private JUNCTION_DRIVE_STATE q = JUNCTION_DRIVE_STATE.START;
 
+    private double rotation;
+
     public JunctionDrive(OpenCvCamera phoneCam){
         pipeline = new JunctionOpenCVPipeline();
         phoneCam.setPipeline(pipeline);
@@ -32,6 +34,15 @@ public class JunctionDrive {
             }
         });
 
+        rotation = 0;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
+    public double getRotation() {
+        return rotation;
     }
 
     public boolean isStick(int pos) {
@@ -48,14 +59,14 @@ public class JunctionDrive {
                 } else if (isStick(2)) {
                     q = JUNCTION_DRIVE_STATE.ROT11;
                 } else {
-                    return JUNCTION_DRIVE.SCORE;
+                    q = JUNCTION_DRIVE_STATE.ROT00;
                 }
                 return JUNCTION_DRIVE.SKIP;
             }
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT00) {
-            if (isStick(0) || isStick(2) || false) { // TODO: max rot
+            if (isStick(0) || isStick(2) || Math.abs(rotation) > 20) {
                 q = JUNCTION_DRIVE_STATE.ROT01;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -63,7 +74,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT10) {
-            if (isStick(0) || isStick(2) || false) { // TODO: max rot
+            if (isStick(0) || isStick(2) || Math.abs(rotation) > 20) {
                 q = JUNCTION_DRIVE_STATE.ROT11;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -71,7 +82,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT01) {
-            if ((!isStick(0) && !isStick(2)) || false) { // TODO: max rot
+            if ((!isStick(0) && !isStick(2)) || Math.abs(rotation) > 20) {
                 q = JUNCTION_DRIVE_STATE.FOR;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -79,7 +90,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT11) {
-            if ((!isStick(0) && !isStick(2)) || false) { // TODO: max rot
+            if ((!isStick(0) && !isStick(2)) || Math.abs(rotation) > 20) {
                 q = JUNCTION_DRIVE_STATE.FOR;
                 return JUNCTION_DRIVE.SKIP;
             }
