@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -13,6 +15,10 @@ import org.firstinspires.ftc.teamcode.HardwareMaps.FullHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.GyroHardwareMap;
 import org.firstinspires.ftc.teamcode.HardwareMaps.WebcamHardwareMap;
 import org.firstinspires.ftc.teamcode.Tools.FieldNavigation;
+import org.firstinspires.ftc.teamcode.Tools.JUNCTION_DRIVE;
+import org.firstinspires.ftc.teamcode.Tools.JUNCTION_DRIVE_STATE;
+import org.firstinspires.ftc.teamcode.Tools.JunctionDrive;
+import org.firstinspires.ftc.teamcode.Tools.JunctionOpenCVPipeline;
 import org.firstinspires.ftc.teamcode.Tools.SignalDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -44,6 +50,10 @@ public abstract class BaseAutonomous extends LinearOpMode {
 
     public int signal_detected;
 
+    protected JunctionDrive junctiondrive;
+
+
+
     public void output() {
         telemetry.addData("x",navi.position_x);
         telemetry.addData("z",navi.position_z);
@@ -72,6 +82,8 @@ public abstract class BaseAutonomous extends LinearOpMode {
                 2/180., 2.5e-4
 
         );
+
+
     }
 
     protected void initVuforia() {
@@ -233,6 +245,11 @@ public abstract class BaseAutonomous extends LinearOpMode {
             navi.step();
             output();
         }
+
+
+
+
+
         robot.motor_lift.setTargetPosition((int) lift_start_encoder_value - 10100);
         while (navi.drive && opModeIsActive()) {
             navi.step();
@@ -288,6 +305,7 @@ public abstract class BaseAutonomous extends LinearOpMode {
             navi.step();
             output();
         }
+
 
         // reset z
         navi.position_z = 160*fz;
@@ -510,6 +528,47 @@ public abstract class BaseAutonomous extends LinearOpMode {
     }
 
 
+    public void driveToJunctionCV() {
+
+        JUNCTION_DRIVE action;
+        double start_rotation;
+        start_rotation = navi.rotation_y;
+
+        while (opModeIsActive() && true) {  // TODO zeit
+            action = junctiondrive.step();
+            switch (action) {
+                case DRIVE_FORW:
+                    //telemetry.addLine("Foward");
+                    navi.drive_setSpeed(-1,0,0,0.28);
+                    break;
+                case END2:
+                    //telemetry.addLine("Parking");
+                    navi.drive_setSpeed(0,0,0,0);
+                    break;
+                case ROT_LEFT:
+                    //telemetry.addLine("Rotate left");
+                    navi.drive_setSpeed(0, 0, -1, 0.28);
+                    break;
+                case ROT_RIGHT:
+                    //telemetry.addLine("Rotate Right");
+                    navi.drive_setSpeed(0, 0, 1, 0.28);
+                    break;
+                case SCORE:
+                    //telemetry.addLine("Place cone on junction");
+                    navi.drive_setSpeed(0, 0, 0, 0);
+                    break;
+                case SKIP:
+                    //telemetry.addLine("Nothing");
+                    break;
+            }
+            // update navi
+            navi.step();
+
+            junctiondrive.setRotation(start_rotation - navi.rotation_y);
+
+        }
+
+    }
 
     public abstract void run();
 }

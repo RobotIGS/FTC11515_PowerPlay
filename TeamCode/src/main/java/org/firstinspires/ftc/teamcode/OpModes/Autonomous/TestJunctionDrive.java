@@ -32,6 +32,7 @@ public class TestJunctionDrive extends BaseTeleOp {
 
     double start_rotation;
     double last_rotation;
+    String outputBuffer = "";
 
     @Override
     public void initialize() {
@@ -43,74 +44,72 @@ public class TestJunctionDrive extends BaseTeleOp {
 
         start_rotation = navi.rotation_y;
         last_rotation = start_rotation;
-
     }
 
     @Override
     public void loop() {
         long startT = (new Date()).getTime();
-        telemetry.addData("", "%3.2f %3.2f %3.2f (L)", junctiondrive.pipeline.returnScalars[0].val[0], junctiondrive.pipeline.returnScalars[0].val[1], junctiondrive.pipeline.returnScalars[0].val[2]);
-        telemetry.addData("", "%3.2f %3.2f %3.2f (M)", junctiondrive.pipeline.returnScalars[1].val[0], junctiondrive.pipeline.returnScalars[1].val[1], junctiondrive.pipeline.returnScalars[1].val[2]);
-        telemetry.addData("", "%3.2f %3.2f %3.2f (R)", junctiondrive.pipeline.returnScalars[2].val[0], junctiondrive.pipeline.returnScalars[2].val[1], junctiondrive.pipeline.returnScalars[2].val[2]);
+        telemetry.addData("", "%3.2f %3.2f %3.2f (L) [%s]", junctiondrive.pipeline.returnScalars[0].val[0], junctiondrive.pipeline.returnScalars[0].val[1], junctiondrive.pipeline.returnScalars[0].val[2], junctiondrive.isStick(0)?"True":"False");
+        telemetry.addData("", "%3.2f %3.2f %3.2f (M) [%s]", junctiondrive.pipeline.returnScalars[1].val[0], junctiondrive.pipeline.returnScalars[1].val[1], junctiondrive.pipeline.returnScalars[1].val[2], junctiondrive.isStick(1)?"True":"False");
+        telemetry.addData("", "%3.2f %3.2f %3.2f (R) [%s]", junctiondrive.pipeline.returnScalars[2].val[0], junctiondrive.pipeline.returnScalars[2].val[1], junctiondrive.pipeline.returnScalars[2].val[2], junctiondrive.isStick(2)?"True":"False");
+        telemetry.addData("rotation", junctiondrive.getRotation());
 
-        telemetry.addLine("\nACTION : \n");
+        telemetry.addLine("\nACTIONS : \n");
 
         if (RUN) {
             action = junctiondrive.step();
             switch (action) {
                 case DRIVE_FORW:
-                    telemetry.addLine("Foward");
-                    navi.drive_setMotors(1,0,0,0.5);
+                    //telemetry.addLine("Foward");
+                    outputBuffer += "Forward\n";
+                    navi.drive_setSpeed(-1,0,0,0.28);
                     break;
                 case END2:
-                    navi.drive_setMotors(0,0,0,0);
-                    telemetry.addLine("Parking");
+                    //telemetry.addLine("Parking");
+                    outputBuffer += "Parking\n";
+                    navi.drive_setSpeed(0,0,0,0);
                     RUN = false;
                     break;
                 case ROT_LEFT:
-                    telemetry.addLine("Rotate left");
-                    navi.drive_setMotors(0, 0, -1, 0.3);
+                    //telemetry.addLine("Rotate left");
+                    outputBuffer += "ROT Left\n";
+                    navi.drive_setSpeed(0, 0, -1, 0.28);
                     break;
                 case ROT_RIGHT:
-                    telemetry.addLine("Rotate Right");
-                    navi.drive_setMotors(0, 0, 1, 0.3);
+                    //telemetry.addLine("Rotate Right");
+                    outputBuffer += "ROT Right\n";
+                    navi.drive_setSpeed(0, 0, 1, 0.28);
                     break;
                 case SCORE:
-                    telemetry.addLine("Place cone on junction");
-                    navi.drive_setMotors(0, 0, 0, 0);
+                    //telemetry.addLine("Place cone on junction");
+                    outputBuffer += "Score\n";
+                    navi.drive_setSpeed(0, 0, 0, 0);
                     RUN = false;
                     break;
                 case SKIP:
-                    telemetry.addLine("Nothing");
+                    //telemetry.addLine("Nothing");
+                    outputBuffer += "Nothing\n";
                     break;
 
             }
         } else {
             switch (action) {
                 case END2:
-                    telemetry.addLine("END2");break;
+                    telemetry.addLine("end : END2");break;
                 case SCORE:
-                    telemetry.addLine("SCORE");break;
+                    telemetry.addLine("end : SCORE");break;
                 default:
-                    telemetry.addLine("?????");break;
+                    telemetry.addLine("end : ?????");break;
             }
             telemetry.addLine("DONE");
         }
+        telemetry.addLine(outputBuffer);
         telemetry.update();
 
         // update navi
-        if (action == JUNCTION_DRIVE.ROT_LEFT || action == JUNCTION_DRIVE.ROT_RIGHT) {
-            navi.stepRotation();
-            navi.stepPos();
-        } else {
-            navi.step();
-        }
+        navi.step();
 
         last_rotation = navi.rotation_y;
         junctiondrive.setRotation(start_rotation - navi.rotation_y);
-
-        while (startT+1000 > (new Date()).getTime()) {}
     }
-
-
 }

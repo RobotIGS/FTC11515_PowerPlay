@@ -10,9 +10,9 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class JunctionOpenCVPipeline extends OpenCvPipeline {
     Mat output;
-    int rect_sizex = 45;
+    int rect_sizex = 74;
     int rect_sizey = 50;
-    int rect_side_sizex = 20;
+    int rect_side_sizex = 8;
     int rect_dx = 0; // 20
     int rect_dy = 0; // -25;
     private Rect cropRectR;

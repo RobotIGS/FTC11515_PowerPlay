@@ -66,7 +66,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT00) {
-            if (isStick(0) || isStick(2) || Math.abs(rotation) > 20) {
+            if (isStick(1) || isStick(2) || rotation > 20) {
                 q = JUNCTION_DRIVE_STATE.ROT01;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -74,7 +74,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT10) {
-            if (isStick(0) || isStick(2) || Math.abs(rotation) > 20) {
+            if (isStick(0) || isStick(1) || rotation < -20) {
                 q = JUNCTION_DRIVE_STATE.ROT11;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -82,7 +82,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT01) {
-            if ((!isStick(0) && !isStick(2)) || Math.abs(rotation) > 20) {
+            if ((isStick(0) || isStick(1)) || rotation < -20) {
                 q = JUNCTION_DRIVE_STATE.FOR;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -90,7 +90,7 @@ public class JunctionDrive {
         }
 
         else if (q == JUNCTION_DRIVE_STATE.ROT11) {
-            if ((!isStick(0) && !isStick(2)) || Math.abs(rotation) > 20) {
+            if ((isStick(1) || isStick(2)) || rotation > 20) {
                 q = JUNCTION_DRIVE_STATE.FOR;
                 return JUNCTION_DRIVE.SKIP;
             }
@@ -100,13 +100,13 @@ public class JunctionDrive {
         else if (q == JUNCTION_DRIVE_STATE.FOR) {
             if (false)                                           // TODO: max time
                 return JUNCTION_DRIVE.END2;
-            if (isStick(1)) {
+            if (isStick(1) || (isStick(0) && isStick(2))) {
                 return JUNCTION_DRIVE.SCORE;
             }
-            if (isStick(0)) {
+            if (isStick(2)) {
                 return JUNCTION_DRIVE.ROT_RIGHT;
             }
-            if (isStick(2)) {
+            if (isStick(0)) {
                 return  JUNCTION_DRIVE.ROT_LEFT;
             }
             return JUNCTION_DRIVE.DRIVE_FORW;
